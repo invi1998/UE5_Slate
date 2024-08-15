@@ -23,6 +23,6 @@ class SUPERMANAGER_API UQuickAssetAction : public UAssetActionUtility
 
 public:
 	UFUNCTION(CallInEditor)
-	void TestFunc();
+	static void TestFunc();
 	
 };
