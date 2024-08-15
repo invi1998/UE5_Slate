@@ -18,7 +18,8 @@ public class SuperManager : ModuleRules
 		PrivateIncludePaths.AddRange(
 			new string[] {
 				// ... add other private include paths required here ...
-			}
+				"AssetTools",
+            }
 			);
 			
 		
@@ -26,6 +27,7 @@ public class SuperManager : ModuleRules
 			new string[]
 			{
 				"Core",
+                "Blutility",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

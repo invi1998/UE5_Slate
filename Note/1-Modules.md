@@ -205,5 +205,19 @@ ModuleTestModule.cpp
 
 
 
+修改插件的模块设置
+
+```c++
+	"Modules": [
+		{
+			"Name": "SuperManager",
+			"Type": "Editor",		// 编辑器模块, 用于创建自定义编辑器工具（此外还有Runtime模块, 用于创建游戏逻辑）
+			"LoadingPhase": "PreDefault"	// 加载阶段, PreDefault 为默认加载阶段之前，所以现在这个插件会在引擎启动时加载，游戏模块加载前加载
+		}
+```
+
+
+
+
 
 
