@@ -22,7 +22,8 @@ class SUPERMANAGER_API UQuickAssetAction : public UAssetActionUtility
 	GENERATED_BODY()
 
 public:
+
 	UFUNCTION(CallInEditor)
-	static void TestFunc();
+	static void DuplicateSelectedAssets(int32 NumCopies);		// 复制选中的资产
 	
 };
