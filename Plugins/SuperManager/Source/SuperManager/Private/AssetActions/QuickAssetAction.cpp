@@ -97,6 +97,23 @@ void UQuickAssetAction::AddPrefixToSelectedAssets() const
 			continue;
 		}
 
+		// 如果老的资源名称包含前缀，则去掉前缀
+		for (const auto& PrefixPair : AssetPrefixMap)
+		{
+			if (OldAssetName.StartsWith(PrefixPair.Value))
+			{
+				OldAssetName = OldAssetName.RightChop(PrefixPair.Value.Len());		// 去掉前缀
+				PrintDebug(FString::Printf(TEXT("Removed prefix %s from asset: %s"), *PrefixPair.Value, *OldAssetName), FColor::Yellow);
+				break;
+			}
+		}
+
+		// 如果是材质实例，需要去掉后缀（_Inst）
+		if (Asset->IsA<UMaterialInstanceConstant>())
+		{
+			OldAssetName.RemoveFromEnd(TEXT("_Inst"));
+		}
+
 		FString NewAssetName = Prefix + OldAssetName;	// 新资源名称
 
 		UEditorUtilityLibrary::RenameAsset(Asset, NewAssetName);	// 重命名资源
