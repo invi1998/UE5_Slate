@@ -1,21 +1,10 @@
-#pragma once
+# Custom Editor Message
 
-#include "Misc/MessageDialog.h"
+## MessageDialog & NotificationInfo (消息弹窗和通知消息)
+
+```c++
 #include "Widgets/Notifications/SNotificationList.h"
 #include "Framework/Notifications/NotificationManager.h"
-
-inline void PrintDebug(const FString& InString, const FColor& InColor)
-{
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, InColor, InString);
-	}
-}
-
-inline void PrintLog(const FString& InString)
-{
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *InString);
-}
 
 inline EAppReturnType::Type ShowMessageDialog(const FText& InContent, const FText& InTitle, EAppMsgType::Type InType)
 {
@@ -37,3 +26,7 @@ inline void ShowNotifyInfo(const FText& InContent, const FText& InTitle)
 
 	FSlateNotificationManager::Get().AddNotification(Info);	// 添加通知
 }
+```
+
+
+

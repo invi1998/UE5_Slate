@@ -11,16 +11,17 @@ void UQuickAssetAction::DuplicateSelectedAssets(int32 NumCopies)
 {
 	if (NumCopies <= 0)
 	{
-		PrintDebug("Invalid number of copies", FColor::Red);
-		PrintLog("Invalid number of copies");
+		// 使用消息框显示错误信息
+		ShowMessageDialog(FText::FromString("Invalid number of copies"), FText::FromString("Error"), EAppMsgType::Ok);
+
 		return;
 	}
 
 	TArray<FAssetData> SelectedAssets = UEditorUtilityLibrary::GetSelectedAssetData();	// 获取选中的资源
 	if (SelectedAssets.Num() == 0)
 	{
-		PrintDebug("No assets selected", FColor::Red);
-		PrintLog("No assets selected");
+		ShowMessageDialog(FText::FromString("No assets selected"), FText::FromString("Warning"), EAppMsgType::Ok);
+
 		return;
 	}
 
@@ -53,12 +54,10 @@ void UQuickAssetAction::DuplicateSelectedAssets(int32 NumCopies)
 
 	if (NumDuplicatedAssets > 0)
 	{
-		PrintDebug(FString::Printf(TEXT("Duplicated %d assets"), NumDuplicatedAssets), FColor::Green);
-		PrintLog(FString::Printf(TEXT("Duplicated %d assets"), NumDuplicatedAssets));
+		ShowNotifyInfo(FText::FromString(FString::Printf(TEXT("Duplicated %d assets"), NumDuplicatedAssets)), FText::FromString("Success"));
 	}
 	else
 	{
-		PrintDebug("No assets duplicated", FColor::Red);
-		PrintLog("No assets duplicated");
+		ShowNotifyInfo(FText::FromString("No assets duplicated"), FText::FromString("Warning"));
 	}
 }
