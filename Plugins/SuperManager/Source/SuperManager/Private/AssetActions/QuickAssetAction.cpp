@@ -16,7 +16,7 @@ void UQuickAssetAction::DuplicateSelectedAssets(int32 NumCopies)
 		return;
 	}
 
-	TArray<FAssetData> SelectedAssets = UEditorUtilityLibrary::GetSelectedAssetData();
+	TArray<FAssetData> SelectedAssets = UEditorUtilityLibrary::GetSelectedAssetData();	// 获取选中的资源
 	if (SelectedAssets.Num() == 0)
 	{
 		PrintDebug("No assets selected", FColor::Red);
@@ -24,34 +24,41 @@ void UQuickAssetAction::DuplicateSelectedAssets(int32 NumCopies)
 		return;
 	}
 
-	for (FAssetData Asset : SelectedAssets)
+	uint32 NumDuplicatedAssets = 0;
+
+	for (const FAssetData& Asset : SelectedAssets)
 	{
-		FString AssetPath = Asset.ObjectPath.ToString();
-		FString AssetName = Asset.AssetName.ToString();
-		FString AssetClass = Asset.AssetClass.ToString();
-		FString AssetPackage = Asset.PackageName.ToString();
-
-		PrintDebug("AssetPath: " + AssetPath, FColor::Green);
-		PrintDebug("AssetName: " + AssetName, FColor::Green);
-		PrintDebug("AssetClass: " + AssetClass, FColor::Green);
-		PrintDebug("AssetPackage: " + AssetPackage, FColor::Green);
-
-		FString NewAssetName = AssetName + "_Copy";
-		FString NewAssetPath = AssetPackage + "/" + NewAssetName;
-
-		PrintDebug("NewAssetName: " + NewAssetName, FColor::Green);
-		PrintDebug("NewAssetPath: " + NewAssetPath, FColor::Green);
-
-		FAssetData NewAsset = UEditorAssetLibrary::DuplicateAsset(AssetPath, NewAssetPath);
-		if (NewAsset.IsValid())
+		for (int32 i = 0; i < NumCopies; ++i)
 		{
-			PrintDebug("Asset duplicated successfully", FColor::Green);
-			PrintLog("Asset duplicated successfully");
+			FString SourceAssetPath = Asset.GetSoftObjectPath().ToString();		// 获取资源路径
+			FString NewAssetName = Asset.AssetName.ToString() + FString::Printf(TEXT("_Copy%d"), i+1);	// 新资源名称
+			FString NewAssetPathName = FPaths::Combine(Asset.PackagePath.ToString(), NewAssetName);	// 新资源路径
+
+			FAssetData NewAsset = UEditorAssetLibrary::DuplicateAsset(SourceAssetPath, NewAssetPathName);	// 复制资源
+			if (NewAsset.IsValid())
+			{
+				UEditorAssetLibrary::SaveAsset(NewAssetPathName, false);	// 保存资源
+				++NumDuplicatedAssets;
+
+				PrintDebug(FString::Printf(TEXT("Duplicated asset: %s"), *NewAsset.AssetName.ToString()), FColor::Green);
+				PrintLog(FString::Printf(TEXT("Duplicated asset: %s"), *NewAsset.AssetName.ToString()));
+			}
+			else
+			{
+				PrintDebug(FString::Printf(TEXT("Failed to duplicate asset: %s"), *Asset.AssetName.ToString()), FColor::Red);
+				PrintLog(FString::Printf(TEXT("Failed to duplicate asset: %s"), *Asset.AssetName.ToString()));
+			}
 		}
-		else
-		{
-			PrintDebug("Failed to duplicate asset", FColor::Red);
-			PrintLog("Failed to duplicate asset");
-		}
+	}
+
+	if (NumDuplicatedAssets > 0)
+	{
+		PrintDebug(FString::Printf(TEXT("Duplicated %d assets"), NumDuplicatedAssets), FColor::Green);
+		PrintLog(FString::Printf(TEXT("Duplicated %d assets"), NumDuplicatedAssets));
+	}
+	else
+	{
+		PrintDebug("No assets duplicated", FColor::Red);
+		PrintLog("No assets duplicated");
 	}
 }
