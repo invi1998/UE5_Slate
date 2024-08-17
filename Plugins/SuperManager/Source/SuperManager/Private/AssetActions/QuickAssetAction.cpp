@@ -6,7 +6,6 @@
 #include "EditorUtilityLibrary.h"
 #include "EditorAssetLibrary.h"
 
-
 void UQuickAssetAction::DuplicateSelectedAssets(int32 NumCopies)
 {
 	if (NumCopies <= 0)
@@ -60,4 +59,49 @@ void UQuickAssetAction::DuplicateSelectedAssets(int32 NumCopies)
 	{
 		ShowNotifyInfo(FText::FromString("No assets duplicated"), FText::FromString("Warning"));
 	}
+}
+
+void UQuickAssetAction::AddPrefixToSelectedAssets() const
+{
+	TArray<UObject*> SelectedAssets = UEditorUtilityLibrary::GetSelectedAssets();	// 获取选中的资源
+	uint32 NumPrefixedAssets = 0;
+
+	for (UObject* Asset : SelectedAssets)
+	{
+		if (!Asset)
+		{
+			PrintDebug(FString::Printf(TEXT("Invalid asset: %s"), *Asset->GetName()), FColor::Red);
+			PrintLog(FString::Printf(TEXT("Invalid asset: %s"), *Asset->GetName()));
+
+			continue;
+		}
+
+		FString Prefix = AssetPrefixMap.FindRef(Asset->GetClass());	// 获取前缀
+		if (Prefix.IsEmpty())
+		{
+			// 打印Asset->GetClass()的名称
+			PrintDebug(FString::Printf(TEXT("No prefix for asset: %s"), *Asset->GetName()), FColor::Red);
+			PrintLog(FString::Printf(TEXT("No prefix for asset: %s"), *Asset->GetName()));
+
+			continue;
+		}
+
+		FString OldAssetName = Asset->GetName();	// 旧资源名称
+
+		// 如果资源名称已经包含前缀，则跳过
+		if (OldAssetName.StartsWith(Prefix))
+		{
+			PrintDebug(FString::Printf(TEXT("Asset already prefixed: %s"), *OldAssetName), FColor::Yellow);
+			PrintLog(FString::Printf(TEXT("Asset already prefixed: %s"), *OldAssetName));
+
+			continue;
+		}
+
+		FString NewAssetName = Prefix + OldAssetName;	// 新资源名称
+
+		UEditorUtilityLibrary::RenameAsset(Asset, NewAssetName);	// 重命名资源
+		++NumPrefixedAssets;
+	}
+
+	ShowNotifyInfo(FText::FromString(FString::Printf(TEXT("Prefixed %d assets"), NumPrefixedAssets)), FText::FromString("Success"));
 }

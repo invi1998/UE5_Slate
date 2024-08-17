@@ -11,6 +11,17 @@
 #include "AssetViewUtils.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 
+#include "Materials/Material.h"
+#include "Materials/MaterialInstanceConstant.h"
+#include "Particles/ParticleSystem.h"	
+#include "Sound/SoundCue.h"
+#include "Sound/SoundWave.h"
+#include "Engine/Texture.h"
+#include "Blueprint/UserWidget.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraEmitter.h"
+
 #include "QuickAssetAction.generated.h"
 
 /**
@@ -22,8 +33,29 @@ class SUPERMANAGER_API UQuickAssetAction : public UAssetActionUtility
 	GENERATED_BODY()
 
 public:
-
 	UFUNCTION(CallInEditor)
 	static void DuplicateSelectedAssets(int32 NumCopies);		// 复制选中的资产
+
+	UFUNCTION(CallInEditor)
+	void AddPrefixToSelectedAssets() const;		// 为选中的资产添加前缀
+
+private:
+	// 资产前缀映射（该映射用于给UE5中所有的资产类型添加前缀）
+    TMap<UClass*, FString> AssetPrefixMap = {
+	    {UBlueprint::StaticClass(),TEXT("BP_")},
+		{UStaticMesh::StaticClass(),TEXT("SM_")},
+		{UMaterial::StaticClass(), TEXT("M_")},
+		{UMaterialInstanceConstant::StaticClass(),TEXT("MI_")},
+		{UMaterialFunctionInterface::StaticClass(), TEXT("MF_")},
+		{UParticleSystem::StaticClass(), TEXT("PS_")},
+		{USoundCue::StaticClass(), TEXT("SC_")},
+		{USoundWave::StaticClass(), TEXT("SW_")},
+		{UTexture::StaticClass(), TEXT("T_")},
+		{UTexture2D::StaticClass(), TEXT("T_")},
+		{UUserWidget::StaticClass(), TEXT("WBP_")},
+		{USkeletalMeshComponent::StaticClass(), TEXT("SK_")},
+		{UNiagaraSystem::StaticClass(), TEXT("NS_")},
+		{UNiagaraEmitter::StaticClass(), TEXT("NE_")},
+    };
 	
 };
