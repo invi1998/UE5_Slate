@@ -5,6 +5,7 @@
 #include "DebugHeader.h"
 #include "EditorUtilityLibrary.h"
 #include "EditorAssetLibrary.h"
+#include "ObjectTools.h"
 
 void UQuickAssetAction::DuplicateSelectedAssets(int32 NumCopies)
 {
@@ -121,4 +122,43 @@ void UQuickAssetAction::AddPrefixToSelectedAssets() const
 	}
 
 	ShowNotifyInfo(FText::FromString(FString::Printf(TEXT("Prefixed %d assets"), NumPrefixedAssets)), FText::FromString("Success"));
+}
+
+void UQuickAssetAction::RemoveUnusedAssets()
+{
+	TArray<FAssetData> SelectedAssetsData = UEditorUtilityLibrary::GetSelectedAssetData();	// 获取资源
+	TArray<FAssetData> UnusedAssetsData;
+
+	for (const FAssetData& SelectedAsset : SelectedAssetsData)
+	{
+		// 这里获取资源的引用者，需要传递资产路径，在源码里提到：FName 资产路径（AssetPaths）已弃用。使用 GetSoftObjectPath 获取此资产在加载时在内存中使用的路径，或使用 GetObjectPathString（） 来获取 ObjectPathString（）
+		TArray<FString> AssetReferences =  UEditorAssetLibrary::FindPackageReferencersForAsset(SelectedAsset.GetObjectPathString(), false);	// 获取资源引用者
+
+		// 如果资源没有引用者，则添加到未使用资源列表
+		if (AssetReferences.Num() == 0)
+		{
+			UnusedAssetsData.Add(SelectedAsset);
+		}
+	}
+
+	if (UnusedAssetsData.Num() == 0)
+	{
+		ShowMessageDialog(FText::FromString("No unused assets found"), FText::FromString("Warning"), EAppMsgType::Ok);
+		return;
+	}
+
+	// 虽然我们这里可以调用UEditorAssetLibrary::DeleteAssets，但是因为这里资产删除是永久性的，所以我希望提供一个用户确认的对话框
+	// 所以我们使用ObjectTools::DeleteAssets，这个函数会弹出一个对话框，让用户确认是否删除资源（使用该函数需要引入UnrealEd模块）
+
+	const int32 NumOfAssetDelete = ObjectTools::DeleteAssets(UnusedAssetsData, true);	// 删除未使用的资源
+
+	if (NumOfAssetDelete > 0)
+	{
+		ShowNotifyInfo(FText::FromString(FString::Printf(TEXT("Deleted %d unused assets"), NumOfAssetDelete)), FText::FromString("Success"));
+	}
+	else
+	{
+		ShowNotifyInfo(FText::FromString("No unused assets deleted"), FText::FromString("Warning"));
+	}
+
 }

@@ -30,6 +30,7 @@ public class SuperManager : ModuleRules
                 "Blutility",
                 "Niagara",
 				"UMG",
+				"UnrealEd",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

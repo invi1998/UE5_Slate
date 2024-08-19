@@ -39,6 +39,9 @@ public:
 	UFUNCTION(CallInEditor)
 	void AddPrefixToSelectedAssets() const;		// 为选中的资产添加前缀
 
+	UFUNCTION(CallInEditor)
+	static void RemoveUnusedAssets();		// 移除未使用的资产
+
 private:
 	// 资产前缀映射（该映射用于给UE5中所有的资产类型添加前缀）
     TMap<UClass*, FString> AssetPrefixMap = {
