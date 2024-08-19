@@ -34,13 +34,13 @@ class SUPERMANAGER_API UQuickAssetAction : public UAssetActionUtility
 
 public:
 	UFUNCTION(CallInEditor)
-	static void DuplicateSelectedAssets(int32 NumCopies);		// 复制选中的资产
+	void DuplicateSelectedAssets(int32 NumCopies) const;		// 复制选中的资产
 
 	UFUNCTION(CallInEditor)
 	void AddPrefixToSelectedAssets() const;		// 为选中的资产添加前缀
 
 	UFUNCTION(CallInEditor)
-	static void RemoveUnusedAssets();		// 移除未使用的资产
+	void RemoveUnusedAssets() const;		// 移除未使用的资产
 
 private:
 	// 资产前缀映射（该映射用于给UE5中所有的资产类型添加前缀）
@@ -60,5 +60,7 @@ private:
 		{UNiagaraSystem::StaticClass(), TEXT("NS_")},
 		{UNiagaraEmitter::StaticClass(), TEXT("NE_")},
     };
+
+	void FixUpRedirectors() const;		// 修复重定向器（例如：当资产被移动或重命名时，重定向器会指向新的资产）
 	
 };
