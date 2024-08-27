@@ -101,3 +101,80 @@ private:
 在UE5的源码或项目中，`#pragma region` 同样可以用来组织代码。尤其是在较大的类或头文件中，使用 `#pragma region` 来分隔不同的成员变量、函数声明或其他逻辑部分，可以帮助提高代码的可读性和可维护性。
 
 如果你在使用Visual Studio作为开发环境，那么`#pragma region`将非常有用，因为Visual Studio提供了很好的支持来显示和操作这些区域。然而，在其他环境中，如命令行编译或不同的IDE中，`#pragma region`仅作为注释存在，不会影响代码的行为。
+
+
+
+## Display UI Extension Potions（显示UI扩展点）
+
+显示 UI 扩展点：Edit =》Editor Preferences =》General =》Miscellaneous =》勾选 Display UI Extension Points
+
+![image-20240827152614370](.\img\image-20240827152614370.png)
+
+如图， 我们想在编辑器中添加我们自己的UI项，可是，我们怎么知道应该挂载在哪里（或者说，怎么知道界面上的元素对应到代码里的挂载点是什么呢？）这个时候，UE编辑器设置里的Display UI Extension Potions（显示UI扩展点）就是做这个的
+
+
+
+![image-20240827153039192](.\img\image-20240827153039192.png)
+
+开启后重启编辑器，就可以看到UI扩展点了
+
+![image-20240827153147400](.\img\image-20240827153147400.png)
+
+```c++
+
+#pragma region ContentBrowserMenuExtender
+
+TSharedRef<FExtender> FSuperManagerModule::OnExtendContentBrowserPathViewMenu(const TArray<FString>& SelectedPaths)
+{
+	TSharedRef<FExtender> Extender(new FExtender);
+
+	if (SelectedPaths.Num() > 0)
+	{
+		// 添加菜单项
+		Extender->AddMenuExtension(
+			"Delete",		// 在内容浏览器路径视图菜单中的位置
+			EExtensionHook::After,		// 在Delete菜单项之后添加
+			TSharedPtr<FUICommandList>(),	//
+			FMenuExtensionDelegate::CreateRaw(this, &FSuperManagerModule::OnAddCBMenuEntry)	// 添加菜单项的委托方法
+		);
+	}
+
+	return Extender;
+}
+
+void FSuperManagerModule::InitCBMenuExtender()
+{
+	FContentBrowserModule& ContentBrowser = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");	// 加载内容浏览器模块
+
+	// 添加内容浏览器路径视图菜单扩展器
+	TArray<FContentBrowserMenuExtender_SelectedPaths>& ContentBrowserExtenders = ContentBrowser.GetAllPathViewContextMenuExtenders();
+
+	// CreateRaw 创建代理对象，同时绑定委托方法（等同于先创建代理对象，再绑定委托方法）
+	// CreateRaw 用于创建一个新的 TSharedRef<FContentBrowserMenuExtender_SelectedPaths> 对象，同时绑定 OnExtendContentBrowserPathViewMenu 方法
+	ContentBrowserExtenders.Add(FContentBrowserMenuExtender_SelectedPaths::CreateRaw(this, &FSuperManagerModule::OnExtendContentBrowserPathViewMenu));
+
+}
+
+void FSuperManagerModule::OnAddCBMenuEntry(FMenuBuilder& MenuBuilder)
+{
+	MenuBuilder.AddMenuEntry(
+		LOCTEXT("Delete Unused Assets", "删除未使用的资产"),
+		LOCTEXT("Safely Delete", "安全删除当前文件夹下所有未使用到的资产"),
+		FSlateIcon(),
+		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteUnusedAssetsButtonClicked)
+	);
+}
+
+void FSuperManagerModule::OnDeleteUnusedAssetsButtonClicked()
+{
+	// 删除未使用的资产按钮点击事件
+}
+
+#pragma endregion
+```
+
+
+
+自定义菜单项效果如下
+
+![image-20240827155925993](.\img\image-20240827155925993.png)
