@@ -169,7 +169,7 @@ void UQuickAssetAction::RemoveUnusedAssets() const
 
 }
 
-void UQuickAssetAction::FixUpRedirectors() const
+void UQuickAssetAction::FixUpRedirectors()
 {
 	TArray<UObjectRedirector*> RedirectorToFixArray;	// 重定向器数组
 

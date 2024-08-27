@@ -61,6 +61,6 @@ private:
 		{UNiagaraEmitter::StaticClass(), TEXT("NE_")},
     };
 
-	void FixUpRedirectors() const;		// 修复重定向器（例如：当资产被移动或重命名时，重定向器会指向新的资产）
+	static void FixUpRedirectors();		// 修复重定向器（例如：当资产被移动或重命名时，重定向器会指向新的资产）
 	
 };

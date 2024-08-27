@@ -2,11 +2,13 @@
 
 #include "SuperManager.h"
 
+#include "AssetToolsModule.h"
 #include "DebugHeader.h"
 
 #include "ContentBrowserModule.h"
 #include "EditorAssetLibrary.h"
 #include "ObjectTools.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 
 #define LOCTEXT_NAMESPACE "FSuperManagerModule"
 
@@ -92,6 +94,8 @@ void FSuperManagerModule::OnDeleteUnusedAssetsButtonClicked()
 		return;
 	}
 
+	FixUpRedirectors();	// 修复重定向器
+
 	TArray<FAssetData> UnusedAssetsData;	// 未使用的资产数据
 	for (const FString& AssetPath : AssetPathsName)
 	{
@@ -127,6 +131,43 @@ void FSuperManagerModule::OnDeleteUnusedAssetsButtonClicked()
 		SM_Debug::ShowMessageDialog(FText::FromString("No unused assets found in the selected folder"), FText::FromString("Warning"), EAppMsgType::Ok);
 	}
 
+}
+
+void FSuperManagerModule::FixUpRedirectors()
+{
+	TArray<UObjectRedirector*> RedirectorToFixArray;	// 重定向器数组
+
+	// 获取资产注册模块
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::Get().LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+
+	// 创建过滤器
+	FARFilter Filter;
+	Filter.bRecursivePaths = true;	// 递归路径，即包含子目录
+	Filter.PackagePaths.Emplace("/Game");	// 添加包路径
+
+	// 类路径名的筛选器组件。将包含指定类的实例，但不包括子类（默认情况下）的实例。仅当 bRecursiveClasses 为 true 时，才会包含派生类。
+	Filter.ClassPaths.Emplace(USkeletalMeshComponent::StaticClass()->GetPathName());	// 添加类路径
+
+	// 5.1 之后的版本已被弃用（改为使用ClassPaths）
+	// Filter.ClassNames.Emplace(USkeletalMeshComponent::StaticClass()->GetFName());	// 添加类名
+
+	TArray<FAssetData> OutRedirectorAssets;
+
+	AssetRegistryModule.Get().GetAssets(Filter, OutRedirectorAssets);		// 获取资源
+
+	for (const FAssetData& AssetData : OutRedirectorAssets)
+	{
+		if (UObject* Asset = AssetData.GetAsset())	// 获取资源
+		{
+			if (UObjectRedirector* Redirector = Cast<UObjectRedirector>(Asset))	// 转换为重定向器
+			{
+				RedirectorToFixArray.Add(Redirector);	// 添加重定向器 
+			}
+		}
+	}
+
+	// 修复重定向器
+	FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get().FixupReferencers(RedirectorToFixArray);
 }
 
 #pragma endregion

@@ -29,6 +29,8 @@ private:
 
 	TArray<FString> SelectedFolderPaths;	// 选中的文件夹路径
 
+	void FixUpRedirectors();	// 修复重定向器
+
 #pragma endregion
 
 };
