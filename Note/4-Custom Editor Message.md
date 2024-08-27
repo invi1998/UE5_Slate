@@ -178,3 +178,70 @@ void FSuperManagerModule::OnDeleteUnusedAssetsButtonClicked()
 自定义菜单项效果如下
 
 ![image-20240827155925993](.\img\image-20240827155925993.png)
+
+
+
+# 搜索并删除未使用的资产
+
+```C++
+void FSuperManagerModule::OnDeleteUnusedAssetsButtonClicked()
+{
+	// 删除未使用的资产按钮点击事件
+	if (SelectedFolderPaths.Num() > 1)
+	{
+		SM_Debug::ShowMessageDialog(FText::FromString("You can only select one folder at a time"), FText::FromString("Warning"), EAppMsgType::Ok);
+		return;
+	}
+
+	const TArray<FString> AssetPathsName = UEditorAssetLibrary::ListAssets(SelectedFolderPaths[0], true);	// 获取文件夹下所有资产路径
+	if (AssetPathsName.Num() == 0)
+	{
+		SM_Debug::ShowMessageDialog(FText::FromString("No assets found in the selected folder"), FText::FromString("Warning"), EAppMsgType::Ok);
+		return;
+	}
+
+	EAppReturnType::Type Result = SM_Debug::ShowMessageDialog(FText::FromString("Are you sure you want to delete all unused assets in the selected folder?"), FText::FromString("Warning"), EAppMsgType::YesNo);
+
+	if (Result == EAppReturnType::No)
+	{
+		return;
+	}
+
+	TArray<FAssetData> UnusedAssetsData;	// 未使用的资产数据
+	for (const FString& AssetPath : AssetPathsName)
+	{
+		// 不要处理根路径下的 Developers 和 Collections 文件夹，因为这些文件夹通常是引擎或插件的文件夹，虽然不会出现在内容浏览器中，但是我们还是要做一下处理
+		// 删除这两个文件夹下的内容会导致引擎或插件无法正常运行（崩溃）
+		if (AssetPath.Contains(TEXT("Developers")) || AssetPath.Contains(TEXT("	Collections")))
+		{
+			continue;
+		}
+
+		if (!UEditorAssetLibrary::DoesAssetExist(AssetPath))
+		{
+			continue;
+		}
+
+		TArray<FString> AssetReferences = UEditorAssetLibrary::FindPackageReferencersForAsset(AssetPath);	// 获取资源引用者
+
+		if (AssetReferences.Num() == 0)
+		{
+			const FAssetData AssetData = UEditorAssetLibrary::FindAssetData(AssetPath);	// 获取资产数据
+			UnusedAssetsData.Add(AssetData);
+		}
+	}
+
+	if (UnusedAssetsData.Num() > 0)
+	{
+		ObjectTools::DeleteAssets(UnusedAssetsData, true);	// 删除未使用的资产
+
+		SM_Debug::ShowNotifyInfo(FText::FromString(FString::Printf(TEXT("Deleted %d unused assets"), UnusedAssetsData.Num())), FText::FromString("Success"));
+	}
+	else
+	{
+		SM_Debug::ShowMessageDialog(FText::FromString("No unused assets found in the selected folder"), FText::FromString("Warning"), EAppMsgType::Ok);
+	}
+
+}
+```
+

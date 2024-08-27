@@ -14,7 +14,7 @@ void UQuickAssetAction::DuplicateSelectedAssets(int32 NumCopies) const
 	if (NumCopies <= 0)
 	{
 		// 使用消息框显示错误信息
-		ShowMessageDialog(FText::FromString("Invalid number of copies"), FText::FromString("Error"), EAppMsgType::Ok);
+		SM_Debug::ShowMessageDialog(FText::FromString("Invalid number of copies"), FText::FromString("Error"), EAppMsgType::Ok);
 
 		return;
 	}
@@ -24,7 +24,7 @@ void UQuickAssetAction::DuplicateSelectedAssets(int32 NumCopies) const
 	TArray<FAssetData> SelectedAssets = UEditorUtilityLibrary::GetSelectedAssetData();	// 获取选中的资源
 	if (SelectedAssets.Num() == 0)
 	{
-		ShowMessageDialog(FText::FromString("No assets selected"), FText::FromString("Warning"), EAppMsgType::Ok);
+		SM_Debug::ShowMessageDialog(FText::FromString("No assets selected"), FText::FromString("Warning"), EAppMsgType::Ok);
 
 		return;
 	}
@@ -45,24 +45,24 @@ void UQuickAssetAction::DuplicateSelectedAssets(int32 NumCopies) const
 				UEditorAssetLibrary::SaveAsset(NewAssetPathName, false);	// 保存资源
 				++NumDuplicatedAssets;
 
-				PrintDebug(FString::Printf(TEXT("Duplicated asset: %s"), *NewAsset.AssetName.ToString()), FColor::Green);
-				PrintLog(FString::Printf(TEXT("Duplicated asset: %s"), *NewAsset.AssetName.ToString()));
+				SM_Debug::PrintDebug(FString::Printf(TEXT("Duplicated asset: %s"), *NewAsset.AssetName.ToString()), FColor::Green);
+				SM_Debug::PrintLog(FString::Printf(TEXT("Duplicated asset: %s"), *NewAsset.AssetName.ToString()));
 			}
 			else
 			{
-				PrintDebug(FString::Printf(TEXT("Failed to duplicate asset: %s"), *Asset.AssetName.ToString()), FColor::Red);
-				PrintLog(FString::Printf(TEXT("Failed to duplicate asset: %s"), *Asset.AssetName.ToString()));
+				SM_Debug::PrintDebug(FString::Printf(TEXT("Failed to duplicate asset: %s"), *Asset.AssetName.ToString()), FColor::Red);
+				SM_Debug::PrintLog(FString::Printf(TEXT("Failed to duplicate asset: %s"), *Asset.AssetName.ToString()));
 			}
 		}
 	}
 
 	if (NumDuplicatedAssets > 0)
 	{
-		ShowNotifyInfo(FText::FromString(FString::Printf(TEXT("Duplicated %d assets"), NumDuplicatedAssets)), FText::FromString("Success"));
+		SM_Debug::ShowNotifyInfo(FText::FromString(FString::Printf(TEXT("Duplicated %d assets"), NumDuplicatedAssets)), FText::FromString("Success"));
 	}
 	else
 	{
-		ShowNotifyInfo(FText::FromString("No assets duplicated"), FText::FromString("Warning"));
+		SM_Debug::ShowNotifyInfo(FText::FromString("No assets duplicated"), FText::FromString("Warning"));
 	}
 }
 
@@ -75,8 +75,8 @@ void UQuickAssetAction::AddPrefixToSelectedAssets() const
 	{
 		if (!Asset)
 		{
-			PrintDebug(FString::Printf(TEXT("Invalid asset: %s"), *Asset->GetName()), FColor::Red);
-			PrintLog(FString::Printf(TEXT("Invalid asset: %s"), *Asset->GetName()));
+			SM_Debug::PrintDebug(FString::Printf(TEXT("Invalid asset: %s"), *Asset->GetName()), FColor::Red);
+			SM_Debug::PrintLog(FString::Printf(TEXT("Invalid asset: %s"), *Asset->GetName()));
 
 			continue;
 		}
@@ -85,8 +85,8 @@ void UQuickAssetAction::AddPrefixToSelectedAssets() const
 		if (Prefix.IsEmpty())
 		{
 			// 打印Asset->GetClass()的名称
-			PrintDebug(FString::Printf(TEXT("No prefix for asset: %s"), *Asset->GetName()), FColor::Red);
-			PrintLog(FString::Printf(TEXT("No prefix for asset: %s"), *Asset->GetName()));
+			SM_Debug::PrintDebug(FString::Printf(TEXT("No prefix for asset: %s"), *Asset->GetName()), FColor::Red);
+			SM_Debug::PrintLog(FString::Printf(TEXT("No prefix for asset: %s"), *Asset->GetName()));
 
 			continue;
 		}
@@ -96,8 +96,8 @@ void UQuickAssetAction::AddPrefixToSelectedAssets() const
 		// 如果资源名称已经包含前缀，则跳过
 		if (OldAssetName.StartsWith(Prefix))
 		{
-			PrintDebug(FString::Printf(TEXT("Asset already prefixed: %s"), *OldAssetName), FColor::Yellow);
-			PrintLog(FString::Printf(TEXT("Asset already prefixed: %s"), *OldAssetName));
+			SM_Debug::PrintDebug(FString::Printf(TEXT("Asset already prefixed: %s"), *OldAssetName), FColor::Yellow);
+			SM_Debug::PrintLog(FString::Printf(TEXT("Asset already prefixed: %s"), *OldAssetName));
 
 			continue;
 		}
@@ -108,7 +108,7 @@ void UQuickAssetAction::AddPrefixToSelectedAssets() const
 			if (OldAssetName.StartsWith(PrefixPair.Value))
 			{
 				OldAssetName = OldAssetName.RightChop(PrefixPair.Value.Len());		// 去掉前缀
-				PrintDebug(FString::Printf(TEXT("Removed prefix %s from asset: %s"), *PrefixPair.Value, *OldAssetName), FColor::Yellow);
+				SM_Debug::PrintDebug(FString::Printf(TEXT("Removed prefix %s from asset: %s"), *PrefixPair.Value, *OldAssetName), FColor::Yellow);
 				break;
 			}
 		}
@@ -125,7 +125,7 @@ void UQuickAssetAction::AddPrefixToSelectedAssets() const
 		++NumPrefixedAssets;
 	}
 
-	ShowNotifyInfo(FText::FromString(FString::Printf(TEXT("Prefixed %d assets"), NumPrefixedAssets)), FText::FromString("Success"));
+	SM_Debug::ShowNotifyInfo(FText::FromString(FString::Printf(TEXT("Prefixed %d assets"), NumPrefixedAssets)), FText::FromString("Success"));
 }
 
 void UQuickAssetAction::RemoveUnusedAssets() const
@@ -149,7 +149,7 @@ void UQuickAssetAction::RemoveUnusedAssets() const
 
 	if (UnusedAssetsData.Num() == 0)
 	{
-		ShowMessageDialog(FText::FromString("No unused assets found"), FText::FromString("Warning"), EAppMsgType::Ok);
+		SM_Debug::ShowMessageDialog(FText::FromString("No unused assets found"), FText::FromString("Warning"), EAppMsgType::Ok);
 		return;
 	}
 
@@ -160,11 +160,11 @@ void UQuickAssetAction::RemoveUnusedAssets() const
 
 	if (NumOfAssetDelete > 0)
 	{
-		ShowNotifyInfo(FText::FromString(FString::Printf(TEXT("Deleted %d unused assets"), NumOfAssetDelete)), FText::FromString("Success"));
+		SM_Debug::ShowNotifyInfo(FText::FromString(FString::Printf(TEXT("Deleted %d unused assets"), NumOfAssetDelete)), FText::FromString("Success"));
 	}
 	else
 	{
-		ShowNotifyInfo(FText::FromString("No unused assets deleted"), FText::FromString("Warning"));
+		SM_Debug::ShowNotifyInfo(FText::FromString("No unused assets deleted"), FText::FromString("Warning"));
 	}
 
 }

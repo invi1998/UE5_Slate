@@ -27,6 +27,8 @@ private:
 
 	void OnDeleteUnusedAssetsButtonClicked();	// 删除未使用的资产按钮点击事件
 
+	TArray<FString> SelectedFolderPaths;	// 选中的文件夹路径
+
 #pragma endregion
 
 };
