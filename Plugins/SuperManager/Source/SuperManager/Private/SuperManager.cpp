@@ -69,6 +69,13 @@ void FSuperManagerModule::OnAddCBMenuEntry(FMenuBuilder& MenuBuilder)
 		FSlateIcon(),
 		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteUnusedAssetsButtonClicked)
 	);
+
+	MenuBuilder.AddMenuEntry(
+		LOCTEXT("Delete Empty Folders", "删除空文件夹"),
+		LOCTEXT("Safely Delete", "安全删除当前文件夹下所有空文件夹"),
+		FSlateIcon(),
+		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteEmptyFoldersButtonClicked)
+	);
 }
 
 void FSuperManagerModule::OnDeleteUnusedAssetsButtonClicked()
@@ -131,6 +138,74 @@ void FSuperManagerModule::OnDeleteUnusedAssetsButtonClicked()
 		SM_Debug::ShowMessageDialog(FText::FromString("No unused assets found in the selected folder"), FText::FromString("Warning"), EAppMsgType::Ok);
 	}
 
+}
+
+void FSuperManagerModule::OnDeleteEmptyFoldersButtonClicked()
+{
+	// UEditorAssetLibrary::DeleteDirectory(EmptyFolder);	// 删除文件夹
+
+	FixUpRedirectors();	// 修复重定向器
+
+	if (SelectedFolderPaths.Num() > 1)
+	{
+		SM_Debug::ShowMessageDialog(FText::FromString("You can only select one folder at a time"), FText::FromString("Warning"), EAppMsgType::Ok);
+		return;
+	}
+
+	if (SelectedFolderPaths.Num() == 0)
+	{
+		SM_Debug::ShowMessageDialog(FText::FromString("No folder selected"), FText::FromString("Warning"), EAppMsgType::Ok);
+		return;
+	}
+
+	// ListAssets第二个参数为true时，会递归获取所有子目录下的资产，第三个参数为true时，会递归获取所有子目录下的文件夹
+	TArray<FString> FoldersPathsArray = UEditorAssetLibrary::ListAssets(SelectedFolderPaths[0], true, true);	// 获取文件夹路径
+
+	TArray<FString> EmptyFoldersArray;	// 空文件夹数组
+	FString EmptyFolderName;	// 空文件夹名称
+
+	for (const FString& FolderPath : FoldersPathsArray)
+	{
+		if (FolderPath.Contains(TEXT("Developers")) || FolderPath.Contains(TEXT("	Collections")) || FolderPath.Contains(TEXT("__ExternalActors__")) || FolderPath.Contains(TEXT("__ExternalObjects__")))
+		{
+			continue;
+		}
+
+		if (!UEditorAssetLibrary::DoesDirectoryExist(FolderPath))
+		{
+			continue;
+		}
+
+		if (!UEditorAssetLibrary::DoesDirectoryHaveAssets(FolderPath))
+		{
+			EmptyFolderName.Append(FolderPath);
+			EmptyFolderName.Append(TEXT("\n"));
+
+			EmptyFoldersArray.Add(FolderPath);
+		}
+	}
+
+	if (EmptyFoldersArray.Num() > 0)
+	{
+		uint32 DeletedFoldersCount = 0;
+		const EAppReturnType::Type Result = SM_Debug::ShowMessageDialog(FText::FromString(FString::Printf(TEXT("Are you sure you want to delete all empty folders (%d) in the selected folder?\n\n%s"), EmptyFoldersArray.Num(), *EmptyFolderName)), FText::FromString("Warning"), EAppMsgType::OkCancel);
+
+		if (Result == EAppReturnType::Cancel)
+		{
+			return;
+		}
+
+		for (const FString& EmptyFolder : EmptyFoldersArray)
+		{
+			UEditorAssetLibrary::DeleteDirectory(EmptyFolder) ? DeletedFoldersCount++ : SM_Debug::ShowMessageDialog(FText::FromString(FString::Printf(TEXT("Failed to delete folder: %s"), *EmptyFolder)), FText::FromString("Error"), EAppMsgType::Ok);
+		}
+
+		SM_Debug::ShowNotifyInfo(FText::FromString(FString::Printf(TEXT("Deleted %d empty folders"), DeletedFoldersCount)), FText::FromString("Success"));
+	}
+	else
+	{
+		SM_Debug::ShowMessageDialog(FText::FromString("No empty folders found in the selected folder"), FText::FromString("Warning"), EAppMsgType::Ok);
+	}
 }
 
 void FSuperManagerModule::FixUpRedirectors()

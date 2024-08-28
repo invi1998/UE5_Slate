@@ -27,6 +27,8 @@ private:
 
 	void OnDeleteUnusedAssetsButtonClicked();	// 删除未使用的资产按钮点击事件
 
+	void OnDeleteEmptyFoldersButtonClicked();	// 删除空文件夹按钮点击事件
+
 	TArray<FString> SelectedFolderPaths;	// 选中的文件夹路径
 
 	void FixUpRedirectors();	// 修复重定向器
