@@ -101,7 +101,7 @@ void FSuperManagerModule::OnDeleteUnusedAssetsButtonClicked()
 	{
 		// 不要处理根路径下的 Developers 和 Collections 文件夹，因为这些文件夹通常是引擎或插件的文件夹，虽然不会出现在内容浏览器中，但是我们还是要做一下处理
 		// 删除这两个文件夹下的内容会导致引擎或插件无法正常运行（崩溃）
-		if (AssetPath.Contains(TEXT("Developers")) || AssetPath.Contains(TEXT("	Collections")))
+		if (AssetPath.Contains(TEXT("Developers")) || AssetPath.Contains(TEXT("	Collections")) || AssetPath.Contains(TEXT("__ExternalActors__")) || AssetPath.Contains(TEXT("__ExternalObjects__")))
 		{
 			continue;
 		}
