@@ -94,7 +94,7 @@ void FSuperManagerModule::OnDeleteUnusedAssetsButtonClicked()
 		return;
 	}
 
-	EAppReturnType::Type Result = SM_Debug::ShowMessageDialog(FText::FromString("Are you sure you want to delete all unused assets in the selected folder?"), FText::FromString("Warning"), EAppMsgType::YesNo);
+	const EAppReturnType::Type Result = SM_Debug::ShowMessageDialog(FText::FromString("Are you sure you want to delete all unused assets in the selected folder?"), FText::FromString("Warning"), EAppMsgType::YesNo);
 
 	if (Result == EAppReturnType::No)
 	{
@@ -132,6 +132,13 @@ void FSuperManagerModule::OnDeleteUnusedAssetsButtonClicked()
 		ObjectTools::DeleteAssets(UnusedAssetsData, true);	// 删除未使用的资产
 
 		SM_Debug::ShowNotifyInfo(FText::FromString(FString::Printf(TEXT("Deleted %d unused assets"), UnusedAssetsData.Num())), FText::FromString("Success"));
+
+		const EAppReturnType::Type DeleteEmptyFolderConfirmResult = SM_Debug::ShowMessageDialog(FText::FromString("Would you like to delete empty folders in the selected folder?"), FText::FromString("Warning"), EAppMsgType::YesNo);
+
+		if (DeleteEmptyFolderConfirmResult == EAppReturnType::Yes)
+		{
+			OnDeleteEmptyFoldersButtonClicked();
+		}
 	}
 	else
 	{
