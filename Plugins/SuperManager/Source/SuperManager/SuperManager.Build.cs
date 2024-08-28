@@ -44,7 +44,8 @@ public class SuperManager : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore", 
-                "EditorScriptingUtilities",
+                "EditorScriptingUtilities", 
+                "EditorStyle",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

@@ -7,6 +7,7 @@
 
 #include "ContentBrowserModule.h"
 #include "EditorAssetLibrary.h"
+#include "EditorStyleSet.h"
 #include "ObjectTools.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 
@@ -17,6 +18,8 @@ void FSuperManagerModule::StartupModule()
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 
 	InitCBMenuExtender();
+
+	RegisterAdvancedDeletionTabSpawner();
 }
 
 void FSuperManagerModule::ShutdownModule()
@@ -263,10 +266,30 @@ void FSuperManagerModule::FixUpRedirectors()
 void FSuperManagerModule::OnAdvanceDeletionButtonClicked()
 {
 	// 高级删除按钮点击事件
-	SM_Debug::ShowMessageDialog(FText::FromString("Advance Deletion"), FText::FromString("Info"), EAppMsgType::Ok);
+	FGlobalTabmanager::Get()->TryInvokeTab(AdvancedDeletionTabIdName);
 }
 
 #pragma endregion
+
+
+#pragma region CustomEditorTabs
+
+void FSuperManagerModule::RegisterAdvancedDeletionTabSpawner()
+{
+	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(AdvancedDeletionTabIdName, FOnSpawnTab::CreateRaw(this, &FSuperManagerModule::OnSpawnAdvancedDeletionTab))
+	.SetDisplayName(LOCTEXT("AdvancedDeletionTab", "高级删除"));
+}
+
+TSharedRef<SDockTab> FSuperManagerModule::OnSpawnAdvancedDeletionTab(const FSpawnTabArgs& Args)
+{
+	// 生成高级删除选项卡
+	return SNew(SDockTab)
+	.TabRole(ETabRole::NomadTab);
+}
+
+#pragma endregion
+
+
 
 #undef LOCTEXT_NAMESPACE
 	

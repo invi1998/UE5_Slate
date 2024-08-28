@@ -37,4 +37,16 @@ private:
 
 #pragma endregion
 
+
+// 资产工具模块
+#pragma region CustomEditorTabs
+
+	void RegisterAdvancedDeletionTabSpawner();	// 注册高级删除选项卡生成器
+
+	TSharedRef<SDockTab>  OnSpawnAdvancedDeletionTab(const FSpawnTabArgs& Args);	// 生成高级删除选项卡
+
+	FName AdvancedDeletionTabIdName = "AdvancedDeletionTab";	// 高级删除选项卡名称
+
+#pragma endregion
+
 };
