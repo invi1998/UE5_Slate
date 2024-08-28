@@ -33,6 +33,8 @@ private:
 
 	void FixUpRedirectors();	// 修复重定向器
 
+	void OnAdvanceDeletionButtonClicked();	// 高级删除按钮点击事件
+
 #pragma endregion
 
 };

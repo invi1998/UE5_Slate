@@ -76,6 +76,14 @@ void FSuperManagerModule::OnAddCBMenuEntry(FMenuBuilder& MenuBuilder)
 		FSlateIcon(),
 		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteEmptyFoldersButtonClicked)
 	);
+
+	MenuBuilder.AddMenuEntry(
+		LOCTEXT("Advance Deletion", "高级删除"),
+		LOCTEXT("List assets by specific conditions in a table and delete them", "按照特定条件在表格中列出资产并删除"),
+		FSlateIcon(),
+		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnAdvanceDeletionButtonClicked)
+	);
+
 }
 
 void FSuperManagerModule::OnDeleteUnusedAssetsButtonClicked()
@@ -250,6 +258,12 @@ void FSuperManagerModule::FixUpRedirectors()
 
 	// 修复重定向器
 	FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get().FixupReferencers(RedirectorToFixArray);
+}
+
+void FSuperManagerModule::OnAdvanceDeletionButtonClicked()
+{
+	// 高级删除按钮点击事件
+	SM_Debug::ShowMessageDialog(FText::FromString("Advance Deletion"), FText::FromString("Info"), EAppMsgType::Ok);
 }
 
 #pragma endregion
