@@ -4,6 +4,7 @@
 
 #include "SlateBasics.h"
 #include "DebugHeader.h"
+#include "SuperManager.h"
 
 
 void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
@@ -19,7 +20,7 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 	NormalFontInfo.Size = 16;
 
 	FSlateFontInfo SmallFontInfo = FCoreStyle::Get().GetFontStyle("EmbossedText");
-	SmallFontInfo.Size = 12;
+	SmallFontInfo.Size = 8;
 
 	ChildSlot
 		[
@@ -71,7 +72,30 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 						]
 				]
 
-				// 第四行 （底部按钮，用于执行删除操作）
+				// 第四行 （显示资产数量，显示分页按钮，前往第一页，前往上一页，前往下一页，前往最后一页）
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				[
+					SNew(SHorizontalBox)
+
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						[
+							SNew(STextBlock)
+								.Text(FText::FromString("Total: " + FString::FromInt(AssetDataUnderSelectedFolder.Num())))
+								.Font(SmallFontInfo)
+								.Justification(ETextJustify::Left)
+								.ColorAndOpacity(FLinearColor::White)
+						]
+
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						[
+							OnGenerateCutPagesComboBox()
+						]
+				]
+
+				// 第五行 （底部按钮，用于执行删除操作）
 				+ SVerticalBox::Slot()
 				.AutoHeight()
 				[
@@ -181,7 +205,14 @@ TSharedRef<STextBlock> SAdvanceDeletionTab::OnGenerateTextBlockForRowWidget(cons
 
 FReply SAdvanceDeletionTab::OnRowDeleteButtonClicked(TSharedPtr<FAssetData> AssetData)
 {
-	SM_Debug::PrintDebug(AssetData->AssetName.ToString() + " is deleted.", FColor::Red);
+	FSuperManagerModule& SuperManagerModule = FModuleManager::LoadModuleChecked<FSuperManagerModule>("SuperManager");
+	const bool DelRet = SuperManagerModule.DeleteSingleAsset(*AssetData.Get());
+
+	// 刷新表格
+	if (DelRet)
+	{
+		
+	}
 
 	return FReply::Handled();
 }
@@ -194,3 +225,57 @@ TSharedRef<SButton> SAdvanceDeletionTab::OnGenerateButtonForRowWidget(const TSha
 
 	return Button;
 }
+
+TSharedRef<SComboButton> SAdvanceDeletionTab::OnGenerateCutPagesComboBox()
+{
+	TSharedRef<SComboButton> ComboButton = SNew(SComboButton)
+		.ButtonContent()
+		[
+			SNew(STextBlock)
+				.Text(FText::FromString("10 articles / per page"))
+				.Font(FCoreStyle::Get().GetFontStyle("EmbossedText"))
+				.ColorAndOpacity(FLinearColor::White)
+		]
+		.ContentPadding(FMargin(5.0f))
+		.MenuContent()
+		[
+			SNew(SVerticalBox)
+
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				[
+					OnGenerateNoBorderButton(FText::FromString("10 articles / per page"))
+				]
+
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				[
+					OnGenerateNoBorderButton(FText::FromString("50 articles / per page"))
+				]
+
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				[
+					OnGenerateNoBorderButton(FText::FromString("100 articles / per page"))
+				]
+
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				[
+					OnGenerateNoBorderButton(FText::FromString("All articles / per page"))
+				]
+		];
+
+	return ComboButton;
+}
+
+TSharedRef<SButton> SAdvanceDeletionTab::OnGenerateNoBorderButton(const FText& ButtonText)
+{
+	TSharedRef<SButton> Button = SNew(SButton)
+		.Text(ButtonText)
+		.ButtonStyle(FCoreStyle::Get(), "NoBorder")
+		.ForegroundColor(FLinearColor::Gray);
+
+	return Button;
+}
+

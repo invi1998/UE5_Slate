@@ -51,4 +51,11 @@ private:
 
 #pragma endregion
 
+public:
+#pragma region ProccessDataForAssetList
+
+	bool DeleteSingleAsset(const FAssetData& AssetData);	// 删除单个资产
+
+#pragma endregion
+
 };

@@ -332,6 +332,20 @@ TArray<TSharedPtr<FAssetData>> FSuperManagerModule::GetAllAssetDatasUnderSelecte
 #pragma endregion
 
 
+#pragma region ProccessDataForAssetList
+
+bool FSuperManagerModule::DeleteSingleAsset(const FAssetData& AssetData)
+{
+	// 删除单个资产
+	TArray<FAssetData> AssetDataArray;
+	AssetDataArray.Add(AssetData);
+
+	return ObjectTools::DeleteAssets(AssetDataArray, true) > 0;
+}
+
+#pragma endregion
+
+
 
 #undef LOCTEXT_NAMESPACE
 	

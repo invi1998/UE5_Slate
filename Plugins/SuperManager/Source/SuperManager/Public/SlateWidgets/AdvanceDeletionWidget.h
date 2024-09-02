@@ -4,6 +4,22 @@
 
 #include "Widgets/SCompoundWidget.h"
 
+// 定义一个数据模型，用于存储下拉框中的选项
+struct FDropdownOption
+{
+	FText DisplayText;
+	FString Value;
+
+	FDropdownOption(const FText& InDisplayText, const FString& InValue)
+		: DisplayText(InDisplayText), Value(InValue)
+	{}
+
+	bool operator==(const FDropdownOption& Other) const
+	{
+		return Value == Other.Value;
+	}
+};
+
 class SAdvanceDeletionTab : public SCompoundWidget
 {
 
@@ -33,6 +49,15 @@ private:
 	TSharedRef<STextBlock> OnGenerateTextBlockForRowWidget(const FString& TextContent, const FSlateFontInfo& FontInfo);
 
 	FReply OnRowDeleteButtonClicked(TSharedPtr<FAssetData> AssetData);
+
 	TSharedRef<SButton> OnGenerateButtonForRowWidget(const TSharedPtr<FAssetData>& Item);
+
+	TSharedRef<SComboButton> OnGenerateCutPagesComboBox();
+
+	TSharedRef<SButton> OnGenerateNoBorderButton(const FText& ButtonText);
+
+	int32 CurrentPage = 1;	// 当前页码
+
+	int32 OnePageCount = 10;	// 每页显示数量
 };
 
