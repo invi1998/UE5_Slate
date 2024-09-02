@@ -25,5 +25,9 @@ private:
 
 	// 生成资产列表的行
 	TSharedRef<ITableRow> OnGenerateRowForList(TSharedPtr<FAssetData> Item, const TSharedRef<STableViewBase>& OwnerTable);
+
+	TSharedRef<SCheckBox> OnGenerateCheckBox(const TSharedPtr<FAssetData>& Item);
+
+	void OnCheckBoxStateChanged(ECheckBoxState NewState, TSharedPtr<FAssetData> Item);
 };
 

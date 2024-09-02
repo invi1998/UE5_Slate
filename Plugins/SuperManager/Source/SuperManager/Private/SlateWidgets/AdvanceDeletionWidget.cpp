@@ -1,7 +1,10 @@
 // Copyright INVI_1998
 
-#include "SlateBasics.h"
 #include "SlateWidgets/AdvanceDeletionWidget.h"
+
+#include "SlateBasics.h"
+#include "DebugHeader.h"
+
 
 void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 {
@@ -54,7 +57,7 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 
 				// 第三行 （实际的资产列表，用于显示资产，滚动条）
 				+ SVerticalBox::Slot()
-				.AutoHeight()
+				.VAlign(VAlign_Fill)		// 垂直填充
 				[
 					SNew(SScrollBox)
 						.Orientation(Orient_Vertical)
@@ -86,16 +89,76 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 
 TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAssetData> Item, const TSharedRef<STableViewBase>& OwnerTable)
 {
-	FSlateFontInfo NormalFontInfo = FCoreStyle::Get().GetFontStyle("EmbossedText");
-	NormalFontInfo.Size = 12;
+	if (!Item.IsValid())
+	{
+		return SNew(STableRow<TSharedPtr<FAssetData>>, OwnerTable);
+	}
 
 	TSharedRef<STableRow<TSharedPtr<FAssetData>>> TableRow =
 	SNew(STableRow<TSharedPtr<FAssetData>>, OwnerTable)
 		[
-			SNew(STextBlock)
-				.Text(FText::FromString(Item->AssetName.ToString()))
-				.Font(NormalFontInfo)
+			// 水平布局
+			SNew(SHorizontalBox)
+
+				// 第一列：复选框
+				+ SHorizontalBox::Slot()
+				.HAlign(HAlign_Left)
+				.VAlign(VAlign_Center)
+				.FillWidth(0.1)
+				[
+					OnGenerateCheckBox(Item)
+				]
+
+				// 第二列：资产类型（资产类名）
+				+ SHorizontalBox::Slot()
+				[
+					SNew(STextBlock)
+						.Text(FText::FromString(Item->AssetClassPath.ToString()))
+				]
+
+				// 第三列：资产名称
+				+ SHorizontalBox::Slot()
+				[
+					SNew(STextBlock)
+						.Text(FText::FromString(Item->AssetName.ToString()))
+				]
+
+				// 第四列：资产删除按钮
+				+ SHorizontalBox::Slot()
+				[
+					SNew(SButton)
+						.Text(FText::FromString("Delete"))
+				]
 		];
 
 	return TableRow;
+}
+
+TSharedRef<SCheckBox> SAdvanceDeletionTab::OnGenerateCheckBox(const TSharedPtr<FAssetData>& Item)
+{
+	TSharedRef<SCheckBox> CheckBox = SNew(SCheckBox)
+		.Type(ESlateCheckBoxType::CheckBox)
+		.IsChecked(ECheckBoxState::Unchecked)
+		.Visibility(EVisibility::Visible)
+		.OnCheckStateChanged(this, &SAdvanceDeletionTab::OnCheckBoxStateChanged, Item);
+
+	return CheckBox;
+}
+
+void SAdvanceDeletionTab::OnCheckBoxStateChanged(ECheckBoxState NewState, TSharedPtr<FAssetData> Item)
+{
+	switch (NewState)
+	{
+	case ECheckBoxState::Unchecked:
+		SM_Debug::PrintDebug(Item->AssetName.ToString() + " is unchecked.", FColor::Red);
+		break;
+	case ECheckBoxState::Checked:
+		SM_Debug::PrintDebug(Item->AssetName.ToString() + " is checked.", FColor::Green);
+		break;
+	case ECheckBoxState::Undetermined:
+		SM_Debug::PrintDebug(Item->AssetName.ToString() + " is undetermined.", FColor::Yellow);
+		break;
+	default:
+		break;
+	}
 }
