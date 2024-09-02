@@ -11,6 +11,9 @@ class SAdvanceDeletionTab : public SCompoundWidget
 	// SLATE_BEGIN_ARGS 是一个宏，用于定义构造函数的参数列表
 	SLATE_BEGIN_ARGS(SAdvanceDeletionTab) {}
 
+	// SLATE_ARGUMENT 宏用于定义构造函数的参数
+	SLATE_ARGUMENT(FString, TestString)
+
 	SLATE_END_ARGS()
 
 public:

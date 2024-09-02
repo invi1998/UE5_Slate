@@ -9,6 +9,7 @@
 #include "EditorAssetLibrary.h"
 #include "EditorStyleSet.h"
 #include "ObjectTools.h"
+#include "SlateWidgets/AdvanceDeletionWidget.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 
 #define LOCTEXT_NAMESPACE "FSuperManagerModule"
@@ -283,8 +284,12 @@ void FSuperManagerModule::RegisterAdvancedDeletionTabSpawner()
 TSharedRef<SDockTab> FSuperManagerModule::OnSpawnAdvancedDeletionTab(const FSpawnTabArgs& Args)
 {
 	// 生成高级删除选项卡
-	return SNew(SDockTab)
-	.TabRole(ETabRole::NomadTab);
+	return
+		SNew(SDockTab).TabRole(ETabRole::NomadTab)
+		[
+			SNew(SAdvanceDeletionTab)
+				.TestString(TEXT("Test String"))
+		];
 }
 
 #pragma endregion
