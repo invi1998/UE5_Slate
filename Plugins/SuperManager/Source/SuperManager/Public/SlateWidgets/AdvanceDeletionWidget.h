@@ -22,5 +22,8 @@ public:
 
 private:
 	TArray<TSharedPtr<FAssetData>> AssetDataUnderSelectedFolder;	// 选中文件夹下的资产数据
+
+	// 生成资产列表的行
+	TSharedRef<ITableRow> OnGenerateRowForList(TSharedPtr<FAssetData> Item, const TSharedRef<STableViewBase>& OwnerTable);
 };
 

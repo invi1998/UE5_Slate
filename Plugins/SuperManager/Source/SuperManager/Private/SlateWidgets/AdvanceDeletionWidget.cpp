@@ -58,8 +58,14 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 				[
 					SNew(SScrollBox)
 						.Orientation(Orient_Vertical)
-						.ScrollBarAlwaysVisible(true)
+						.ScrollBarAlwaysVisible(false)
 						+ SScrollBox::Slot()
+						[
+							SNew(SListView<TSharedPtr<FAssetData>>)	// 列表视图
+								.ItemHeight(24)
+								.ListItemsSource(&AssetDataUnderSelectedFolder)
+								.OnGenerateRow(this, &SAdvanceDeletionTab::OnGenerateRowForList)
+						]
 				]
 
 				// 第四行 （底部按钮，用于执行删除操作）
@@ -76,4 +82,20 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 						]
 				]
 		];
+}
+
+TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAssetData> Item, const TSharedRef<STableViewBase>& OwnerTable)
+{
+	FSlateFontInfo NormalFontInfo = FCoreStyle::Get().GetFontStyle("EmbossedText");
+	NormalFontInfo.Size = 12;
+
+	TSharedRef<STableRow<TSharedPtr<FAssetData>>> TableRow =
+	SNew(STableRow<TSharedPtr<FAssetData>>, OwnerTable)
+		[
+			SNew(STextBlock)
+				.Text(FText::FromString(Item->AssetName.ToString()))
+				.Font(NormalFontInfo)
+		];
+
+	return TableRow;
 }
