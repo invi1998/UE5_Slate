@@ -29,5 +29,10 @@ private:
 	TSharedRef<SCheckBox> OnGenerateCheckBox(const TSharedPtr<FAssetData>& Item);
 
 	void OnCheckBoxStateChanged(ECheckBoxState NewState, TSharedPtr<FAssetData> Item);
+
+	TSharedRef<STextBlock> OnGenerateTextBlockForRowWidget(const FString& TextContent, const FSlateFontInfo& FontInfo);
+
+	FReply OnRowDeleteButtonClicked(TSharedPtr<FAssetData> AssetData);
+	TSharedRef<SButton> OnGenerateButtonForRowWidget(const TSharedPtr<FAssetData>& Item);
 };
 

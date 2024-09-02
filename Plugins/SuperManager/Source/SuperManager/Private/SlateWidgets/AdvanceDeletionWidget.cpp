@@ -104,30 +104,36 @@ TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAsse
 				+ SHorizontalBox::Slot()
 				.HAlign(HAlign_Left)
 				.VAlign(VAlign_Center)
-				.FillWidth(0.1)
+				.FillWidth(0.05)
 				[
 					OnGenerateCheckBox(Item)
 				]
 
 				// 第二列：资产类型（资产类名）
 				+ SHorizontalBox::Slot()
+				.HAlign(HAlign_Left)
+				.VAlign(VAlign_Fill)
+				.FillWidth(0.45)
 				[
-					SNew(STextBlock)
-						.Text(FText::FromString(Item->AssetClassPath.ToString()))
+					OnGenerateTextBlockForRowWidget(Item->AssetClassPath.ToString(), FCoreStyle::Get().GetFontStyle("EmbossedText"))
 				]
 
 				// 第三列：资产名称
 				+ SHorizontalBox::Slot()
+				.HAlign(HAlign_Left)
+				.VAlign(VAlign_Fill)
+				.FillWidth(0.4)
 				[
-					SNew(STextBlock)
-						.Text(FText::FromString(Item->AssetName.ToString()))
+					OnGenerateTextBlockForRowWidget(Item->AssetName.ToString(), FCoreStyle::Get().GetFontStyle("EmbossedText"))
 				]
 
 				// 第四列：资产删除按钮
 				+ SHorizontalBox::Slot()
+				.HAlign(HAlign_Center)
+				.VAlign(VAlign_Fill)
+				.FillWidth(0.1)
 				[
-					SNew(SButton)
-						.Text(FText::FromString("Delete"))
+					OnGenerateButtonForRowWidget(Item)
 				]
 		];
 
@@ -161,4 +167,30 @@ void SAdvanceDeletionTab::OnCheckBoxStateChanged(ECheckBoxState NewState, TShare
 	default:
 		break;
 	}
+}
+
+TSharedRef<STextBlock> SAdvanceDeletionTab::OnGenerateTextBlockForRowWidget(const FString& TextContent, const FSlateFontInfo& FontInfo)
+{
+	TSharedRef<STextBlock> TextBlock = SNew(STextBlock)
+		.Text(FText::FromString(TextContent))
+		.Font(FontInfo)
+		.ColorAndOpacity(FLinearColor::White);
+
+	return TextBlock;
+}
+
+FReply SAdvanceDeletionTab::OnRowDeleteButtonClicked(TSharedPtr<FAssetData> AssetData)
+{
+	SM_Debug::PrintDebug(AssetData->AssetName.ToString() + " is deleted.", FColor::Red);
+
+	return FReply::Handled();
+}
+
+TSharedRef<SButton> SAdvanceDeletionTab::OnGenerateButtonForRowWidget(const TSharedPtr<FAssetData>& Item)
+{
+	TSharedRef<SButton> Button = SNew(SButton)
+		.Text(FText::FromString("Delete"))
+		.OnClicked(this, &SAdvanceDeletionTab::OnRowDeleteButtonClicked, Item);
+
+	return Button;
 }
