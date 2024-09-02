@@ -288,8 +288,45 @@ TSharedRef<SDockTab> FSuperManagerModule::OnSpawnAdvancedDeletionTab(const FSpaw
 		SNew(SDockTab).TabRole(ETabRole::NomadTab)
 		[
 			SNew(SAdvanceDeletionTab)
-				.TestString(TEXT("Test String"))
+				.AssetDataList(GetAllAssetDatasUnderSelectedFolder())
 		];
+}
+
+TArray<TSharedPtr<FAssetData>> FSuperManagerModule::GetAllAssetDatasUnderSelectedFolder()
+{
+	// 获取此文件夹下的所有资产数据
+	TArray<TSharedPtr<FAssetData>> AssetDataList;
+
+	if (SelectedFolderPaths.Num() > 1)
+	{
+		SM_Debug::ShowMessageDialog(FText::FromString("You can only select one folder at a time"), FText::FromString("Warning"), EAppMsgType::Ok);
+		return AssetDataList;
+	}
+
+	const TArray<FString> AssetPathsName = UEditorAssetLibrary::ListAssets(SelectedFolderPaths[0], true);	// 获取文件夹下所有资产路径
+	if (AssetPathsName.Num() == 0)
+	{
+		SM_Debug::ShowMessageDialog(FText::FromString("No assets found in the selected folder"), FText::FromString("Warning"), EAppMsgType::Ok);
+		return AssetDataList;
+	}
+
+	for (const FString& AssetPath : AssetPathsName)
+	{
+		if (AssetPath.Contains(TEXT("Developers")) || AssetPath.Contains(TEXT("	Collections")) || AssetPath.Contains(TEXT("__ExternalActors__")) || AssetPath.Contains(TEXT("__ExternalObjects__")))
+		{
+			continue;
+		}
+
+		if (!UEditorAssetLibrary::DoesAssetExist(AssetPath))
+		{
+			continue;
+		}
+
+		const FAssetData AssetData = UEditorAssetLibrary::FindAssetData(AssetPath);	// 获取资产数据
+		AssetDataList.Add(MakeShared<FAssetData>(AssetData));
+	}
+
+	return AssetDataList;
 }
 
 #pragma endregion

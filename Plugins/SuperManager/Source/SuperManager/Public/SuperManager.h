@@ -47,6 +47,8 @@ private:
 
 	FName AdvancedDeletionTabIdName = "AdvancedDeletionTab";	// 高级删除选项卡名称
 
+	TArray<TSharedPtr<FAssetData>> GetAllAssetDatasUnderSelectedFolder();	// 获取此文件夹下的所有资产数据
+
 #pragma endregion
 
 };
