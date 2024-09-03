@@ -13,6 +13,9 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 
 	AssetDataUnderSelectedFolder = InArgs._AssetDataList;	// 获取选中文件夹下的资产数据
 
+	CheckBoxList.Empty();
+	SelectedAssetDataList.Empty();
+
 	FSlateFontInfo TitleFontInfo = FCoreStyle::Get().GetFontStyle("EmbossedText");
 	TitleFontInfo.Size = 24;
 
@@ -147,10 +150,13 @@ TSharedRef<SListView<TSharedPtr<FAssetData>>> SAdvanceDeletionTab::OnConstructAs
 
 void SAdvanceDeletionTab::RefreshAssetListView()
 {
+	CheckBoxList.Empty();
+	SelectedAssetDataList.Empty();
+
 	if (ConstructedAssetListView.IsValid())
 	{
-		ConstructedAssetListView->RequestListRefresh();
-		// ConstructedAssetListView->RebuildList();
+		// ConstructedAssetListView->RequestListRefresh();
+		ConstructedAssetListView->RebuildList();
 	}
 	
 }
