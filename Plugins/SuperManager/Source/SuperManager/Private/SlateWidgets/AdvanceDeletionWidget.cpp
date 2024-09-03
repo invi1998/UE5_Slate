@@ -7,13 +7,19 @@
 #include "SuperManager.h"
 
 
-#define LIST_ALL TEXT("List All")
+#define LIST_ALL TEXT("List All Assets")
+#define LIST_UNUSED TEXT("List Unused Assets")
+
 
 void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 {
 	bCanSupportFocus = true;	// 设置焦点
 
+	AssetDataUnderSelectedFolder.Empty();
+	DisplayedAssetDataList.Empty();
+
 	AssetDataUnderSelectedFolder = InArgs._AssetDataList;	// 获取选中文件夹下的资产数据
+	DisplayedAssetDataList = AssetDataUnderSelectedFolder;	// 显示的资产数据列表
 
 	CheckBoxList.Empty();
 	SelectedAssetDataList.Empty();
@@ -30,6 +36,7 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 	ComboBoxSourceItems.Empty();
 
 	ComboBoxSourceItems.Add(MakeShared<FString>(LIST_ALL));
+	ComboBoxSourceItems.Add(MakeShared<FString>(LIST_UNUSED));
 
 	ChildSlot
 		[
@@ -140,7 +147,7 @@ TSharedRef<SListView<TSharedPtr<FAssetData>>> SAdvanceDeletionTab::OnConstructAs
 {
 	ConstructedAssetListView = SNew(SListView<TSharedPtr<FAssetData>>)
 		.ItemHeight(24)
-		.ListItemsSource(&AssetDataUnderSelectedFolder)
+		.ListItemsSource(&DisplayedAssetDataList)
 		.OnGenerateRow(this, &SAdvanceDeletionTab::OnGenerateRowForList);
 
 	return ConstructedAssetListView.ToSharedRef();
@@ -194,6 +201,23 @@ void SAdvanceDeletionTab::OnComboBoxSelectionChanged(TSharedPtr<FString> Selecte
 	}
 
 	ComboDisplayTextBlock->SetText(FText::FromString(*SelectedItem.Get()));
+
+	// 更新按照选项筛选后的资产列表
+	if (*SelectedItem.Get() == LIST_ALL)
+	{
+		// DisplayedAssetDataList = AssetDataUnderSelectedFolder;
+	}
+	else if (*SelectedItem.Get() == LIST_UNUSED)
+	{
+		DisplayedAssetDataList.Empty();
+
+		FSuperManagerModule& SuperManagerModule = FModuleManager::LoadModuleChecked<FSuperManagerModule>("SuperManager");
+		SuperManagerModule.GetUnusedAssets(DisplayedAssetDataList, AssetDataUnderSelectedFolder);
+
+		RefreshAssetListView();
+
+	}
+
 	
 }
 

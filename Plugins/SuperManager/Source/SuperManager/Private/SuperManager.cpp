@@ -349,6 +349,20 @@ bool FSuperManagerModule::DeleteAssets(const TArray<FAssetData>& AssetDatas)
 	return ObjectTools::DeleteAssets(AssetDatas, true) > 0;
 }
 
+void FSuperManagerModule::GetUnusedAssets(TArray<TSharedPtr<FAssetData>>& OutArray, const TArray<TSharedPtr<FAssetData>>& AssetDatas)
+{
+	// 获取未使用的资产
+	for (const TSharedPtr<FAssetData>& AssetData : AssetDatas)
+	{
+		TArray<FString> AssetReferences = UEditorAssetLibrary::FindPackageReferencersForAsset(AssetData->GetObjectPathString());	// 获取资源引用者
+
+		if (AssetReferences.Num() == 0)
+		{
+			OutArray.Add(AssetData);
+		}
+	}
+}
+
 #pragma endregion
 
 

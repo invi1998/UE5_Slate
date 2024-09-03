@@ -56,6 +56,7 @@ public:
 
 	bool DeleteSingleAsset(const FAssetData& AssetData);	// 删除单个资产
 	bool DeleteAssets(const TArray<FAssetData>& AssetDatas);	// 删除资产
+	void GetUnusedAssets(TArray<TSharedPtr<FAssetData>>& OutArray, const TArray<TSharedPtr<FAssetData>>& AssetDatas);	// 获取未使用的资产
 
 #pragma endregion
 

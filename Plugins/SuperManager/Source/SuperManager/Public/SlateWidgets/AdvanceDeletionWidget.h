@@ -23,6 +23,7 @@ public:
 
 private:
 	TArray<TSharedPtr<FAssetData>> AssetDataUnderSelectedFolder;	// 选中文件夹下的资产数据
+	TArray<TSharedPtr<FAssetData>> DisplayedAssetDataList;	// 显示的资产数据列表
 
 	TSharedRef<SListView<TSharedPtr<FAssetData>>> OnConstructAssetListView();	// 构建资产列表视图
 	TSharedPtr<SListView<TSharedPtr<FAssetData>>> ConstructedAssetListView;	// 资产列表视图
