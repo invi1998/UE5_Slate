@@ -9,6 +9,7 @@
 
 #define LIST_ALL TEXT("List All Assets")
 #define LIST_UNUSED TEXT("List Unused Assets")
+#define LIST_SAME_NAME TEXT("List Same Name Assets")
 
 
 void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
@@ -28,7 +29,7 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 	TitleFontInfo.Size = 24;
 
 	FSlateFontInfo NormalFontInfo = FCoreStyle::Get().GetFontStyle("EmbossedText");
-	NormalFontInfo.Size = 16;
+	NormalFontInfo.Size = 12;
 
 	FSlateFontInfo SmallFontInfo = FCoreStyle::Get().GetFontStyle("EmbossedText");
 	SmallFontInfo.Size = 8;
@@ -37,6 +38,7 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 
 	ComboBoxSourceItems.Add(MakeShared<FString>(LIST_ALL));
 	ComboBoxSourceItems.Add(MakeShared<FString>(LIST_UNUSED));
+	ComboBoxSourceItems.Add(MakeShared<FString>(LIST_SAME_NAME));
 
 	ChildSlot
 		[
@@ -123,11 +125,150 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 								]
 						]
 
-						
+
+				]
+
+				// 分割线
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.Padding(5.f)
+				[
+					SNew(SSeparator)
+						.Orientation(Orient_Horizontal)
+						.Thickness(2.f)
+						.ColorAndOpacity(FLinearColor::White)
+				]
+
+				// 第三行 （表头）
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				[
+					SNew(SHorizontalBox)
+
+						// 第一列：复选框
+						+ SHorizontalBox::Slot()
+						.HAlign(HAlign_Left)
+						.VAlign(VAlign_Center)
+						.FillWidth(0.05)
+						.Padding(5.f)
+						[
+							SNew(STextBlock)
+								.Text(FText::FromString(""))
+								.Font(NormalFontInfo)
+								.Justification(ETextJustify::Center)
+								.ColorAndOpacity(FLinearColor::White)
+						]
+
+						// 分割线
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						[
+							SNew(SSeparator)
+								.Orientation(Orient_Vertical)
+								.Thickness(2.f)
+								.ColorAndOpacity(FLinearColor::White)
+						]
+
+						// 第二列：资产类型
+						+ SHorizontalBox::Slot()
+						.HAlign(HAlign_Left)
+						.VAlign(VAlign_Center)
+						.FillWidth(0.25)
+						.Padding(5.f)
+						[
+							SNew(STextBlock)
+								.Text(FText::FromString("Asset Type"))
+								.Font(NormalFontInfo)
+								.Justification(ETextJustify::Center)
+								.ColorAndOpacity(FLinearColor::White)
+						]
+
+						// 分割线
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						[
+							SNew(SSeparator)
+								.Orientation(Orient_Vertical)
+								.Thickness(2.f)
+								.ColorAndOpacity(FLinearColor::White)
+						]
+
+						// 第三列：资产名称
+						+ SHorizontalBox::Slot()
+						.HAlign(HAlign_Left)
+						.VAlign(VAlign_Center)
+						.FillWidth(0.2)
+						.Padding(5.f)
+						[
+							SNew(STextBlock)
+								.Text(FText::FromString("Asset Name"))
+								.Font(NormalFontInfo)
+								.Justification(ETextJustify::Center)
+								.ColorAndOpacity(FLinearColor::White)
+						]
+
+						// 分割线
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						[
+							SNew(SSeparator)
+								.Orientation(Orient_Vertical)
+								.Thickness(2.f)
+								.ColorAndOpacity(FLinearColor::White)
+						]
+
+						// 第四列：资产路径
+						+ SHorizontalBox::Slot()
+						.HAlign(HAlign_Left)
+						.VAlign(VAlign_Center)
+						.FillWidth(0.4)
+						.Padding(5.f)
+						[
+							SNew(STextBlock)
+								.Text(FText::FromString("Asset Path"))
+								.Font(NormalFontInfo)
+								.Justification(ETextJustify::Center)
+								.ColorAndOpacity(FLinearColor::White)
+						]
+
+						// 分割线
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						[
+							SNew(SSeparator)
+								.Orientation(Orient_Vertical)
+								.Thickness(2.f)
+								.ColorAndOpacity(FLinearColor::White)
+						]
+
+						// 第五列：删除按钮
+						+ SHorizontalBox::Slot()
+						.HAlign(HAlign_Center)
+						.VAlign(VAlign_Center)
+						.FillWidth(0.1)
+						.Padding(5.f)
+						[
+							SNew(STextBlock)
+								.Text(FText::FromString("Action"))
+								.Font(NormalFontInfo)
+								.Justification(ETextJustify::Center)
+								.ColorAndOpacity(FLinearColor::White)
+						]
+				]
+
+				// 分割线
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.Padding(2.f)
+				[
+					SNew(SSeparator)
+						.Orientation(Orient_Horizontal)
+						.Thickness(2.f)
+						.ColorAndOpacity(FLinearColor::White)
 				]
 
 
-				// 第三行 （实际的资产列表，用于显示资产，滚动条）
+				// 第四行 （实际的资产列表，用于显示资产，滚动条）
 				+ SVerticalBox::Slot()
 				.VAlign(VAlign_Fill)		// 垂直填充
 				[
@@ -222,6 +363,31 @@ void SAdvanceDeletionTab::OnComboBoxSelectionChanged(TSharedPtr<FString> Selecte
 		FSuperManagerModule& SuperManagerModule = FModuleManager::LoadModuleChecked<FSuperManagerModule>("SuperManager");
 		SuperManagerModule.GetUnusedAssets(DisplayedAssetDataList, AssetDataUnderSelectedFolder);
 	}
+	else if (*SelectedItem.Get() == LIST_SAME_NAME)
+	{
+		DisplayedAssetDataList.Empty();
+
+		TMap<FString, int32> AssetNameMap;
+		for (const TSharedPtr<FAssetData>& AssetData : AssetDataUnderSelectedFolder)
+		{
+			if (AssetNameMap.Contains(AssetData->AssetName.ToString()))
+			{
+				AssetNameMap[AssetData->AssetName.ToString()]++;
+			}
+			else
+			{
+				AssetNameMap.Add(AssetData->AssetName.ToString(), 1);
+			}
+		}
+
+		for (const TSharedPtr<FAssetData>& AssetData : AssetDataUnderSelectedFolder)
+		{
+			if (AssetNameMap[AssetData->AssetName.ToString()] > 1)
+			{
+				DisplayedAssetDataList.Add(AssetData);
+			}
+		}
+	}
 
 	RefreshAssetListView();
 
@@ -259,7 +425,7 @@ TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAsse
 				+ SHorizontalBox::Slot()
 				.HAlign(HAlign_Left)
 				.VAlign(VAlign_Center)
-				.FillWidth(0.45)
+				.FillWidth(0.25)
 				[
 					OnGenerateTextBlockForRowWidget(Item->AssetClassPath.ToString(), FCoreStyle::Get().GetFontStyle("EmbossedText"))
 				]
@@ -268,12 +434,21 @@ TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAsse
 				+ SHorizontalBox::Slot()
 				.HAlign(HAlign_Left)
 				.VAlign(VAlign_Center)
-				.FillWidth(0.4)
+				.FillWidth(0.2)
 				[
 					OnGenerateTextBlockForRowWidget(Item->AssetName.ToString(), FCoreStyle::Get().GetFontStyle("EmbossedText"))
 				]
 
-				// 第四列：资产删除按钮
+				// 第四列：资产路径
+				+ SHorizontalBox::Slot()
+				.HAlign(HAlign_Left)
+				.VAlign(VAlign_Center)
+				.FillWidth(0.4)
+				[
+					OnGenerateTextBlockForRowWidget(Item->GetObjectPathString(), FCoreStyle::Get().GetFontStyle("EmbossedText"))
+				]
+
+				// 第五列：资产删除按钮
 				+ SHorizontalBox::Slot()
 				.HAlign(HAlign_Center)
 				.VAlign(VAlign_Center)
