@@ -67,25 +67,22 @@ private:
 
 #pragma region TabButtons
 	// 全选按钮点击事件, 同时还需要传入按钮本身的引用
-	FReply OnSelectAllButtonClicked();
+	FReply OnSelectAllButtonClicked();		// 全选按钮点击事件
+	FReply OnDeselectAllButtonClicked();	// 取消全选按钮点击事件
 	FReply OnDeleteSelectedButtonClicked();	// 删除选中按钮点击事件
 
-	TSharedRef<SButton> OnGenerateSelectAllToggleButton();	// 生成全选按钮（全选/取消全选）
+	TSharedRef<SButton> OnGenerateSelectAllButton();	// 生成全选按钮
+	TSharedRef<SButton> OnGenerateDeselectAllButton();		// 生成取消全选按钮
 	TSharedRef<SButton> OnGenerateDeleteSelectedButton();	// 生成删除按钮
 
 	TSharedRef<STextBlock> ConstructTextForTabButtons(const FText& TextContent);	// 构建选项卡按钮文本
-
-	bool bIsAllSelected = false;	// 是否全选
-
-	TSharedPtr<SButton> SelectAllToggleButton;	// 全选按钮
-
-	FText CurrentSelectedToggleButtonText;	// 当前选中的按钮文本
 
 	int32 CurrentPage = 1;	// 当前页码
 
 	int32 OnePageCount = 10;	// 每页显示数量
 
 	TArray<TSharedPtr<FAssetData>> SelectedAssetDataList;	// 选中的资产数据列表
+	TArray<TSharedRef<SCheckBox>> CheckBoxList;	// 复选框列表
 
 #pragma endregion
 };

@@ -71,7 +71,16 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 								.VAlign(VAlign_Center)
 								.Padding(5.f)
 								[
-									OnGenerateSelectAllToggleButton()
+									OnGenerateSelectAllButton()
+								]
+
+								+ SHorizontalBox::Slot()
+								.AutoWidth()
+								.HAlign(HAlign_Right)
+								.VAlign(VAlign_Center)
+								.Padding(5.f)
+								[
+									OnGenerateDeselectAllButton()
 								]
 
 								+ SHorizontalBox::Slot()
@@ -211,6 +220,11 @@ TSharedRef<SCheckBox> SAdvanceDeletionTab::OnGenerateCheckBox(const TSharedPtr<F
 		.Visibility(EVisibility::Visible)
 		.OnCheckStateChanged(this, &SAdvanceDeletionTab::OnCheckBoxStateChanged, Item);
 
+	if (!CheckBoxList.Contains(CheckBox))
+	{
+		CheckBoxList.Add(CheckBox);
+	}
+
 	return CheckBox;
 }
 
@@ -344,16 +358,36 @@ TSharedRef<SButton> SAdvanceDeletionTab::OnGenerateNoBorderButton(const FText& B
 
 FReply SAdvanceDeletionTab::OnSelectAllButtonClicked()
 {
-	bIsAllSelected = !bIsAllSelected;
-
-	// 更新按钮文本
-	CurrentSelectedToggleButtonText = bIsAllSelected ? FText::FromString("Cancel All") : FText::FromString("Select All");
-
-	if (SelectAllToggleButton.IsValid())
+	if (CheckBoxList.Num() <= 0)
 	{
-		const FLinearColor ButtonColor = FLinearColor(195.f / 255.f, 248.f / 255.f, 236.f / 255.f, 1.f);
-		SelectAllToggleButton->SetContent(ConstructTextForTabButtons(CurrentSelectedToggleButtonText));
-		SelectAllToggleButton->SetColorAndOpacity(bIsAllSelected ? FLinearColor::White : ButtonColor);
+		return FReply::Handled();
+	}
+
+	for (const TSharedRef<SCheckBox>& CheckBox : CheckBoxList)
+	{
+		if (CheckBox->GetCheckedState() == ECheckBoxState::Unchecked)
+		{
+			CheckBox->ToggleCheckedState();
+		}
+	}
+
+
+	return FReply::Handled();
+}
+
+FReply SAdvanceDeletionTab::OnDeselectAllButtonClicked()
+{
+	if (CheckBoxList.Num() <= 0)
+	{
+		return FReply::Handled();
+	}
+
+	for (const TSharedRef<SCheckBox>& CheckBox : CheckBoxList)
+	{
+		if (CheckBox->GetCheckedState() == ECheckBoxState::Checked)
+		{
+			CheckBox->ToggleCheckedState();
+		}
 	}
 
 	return FReply::Handled();
@@ -391,20 +425,26 @@ FReply SAdvanceDeletionTab::OnDeleteSelectedButtonClicked()
 	return FReply::Handled();
 }
 
-TSharedRef<SButton> SAdvanceDeletionTab::OnGenerateSelectAllToggleButton()
+TSharedRef<SButton> SAdvanceDeletionTab::OnGenerateSelectAllButton()
 {
-	const FLinearColor ButtonColor = FLinearColor(195.f / 255.f, 248.f / 255.f, 236.f / 255.f, 1.f);
 	TSharedRef<SButton> Button = SNew(SButton)
 		.ContentPadding(FMargin(5.f))
 		.ButtonColorAndOpacity(FLinearColor::Green)
 		.OnClicked(this, &SAdvanceDeletionTab::OnSelectAllButtonClicked);
 
-	CurrentSelectedToggleButtonText = bIsAllSelected ? FText::FromString("Cancel All") : FText::FromString("Select All");
+	Button->SetContent(ConstructTextForTabButtons(FText::FromString("Select All")));
 
-	Button->SetContent(ConstructTextForTabButtons(CurrentSelectedToggleButtonText));
-	Button->SetColorAndOpacity(bIsAllSelected ? FLinearColor::White : ButtonColor);
+	return Button;
+}
 
-	SelectAllToggleButton = Button.ToSharedPtr();
+TSharedRef<SButton> SAdvanceDeletionTab::OnGenerateDeselectAllButton()
+{
+	TSharedRef<SButton> Button = SNew(SButton)
+		.ContentPadding(FMargin(5.f))
+		.ButtonColorAndOpacity(FLinearColor::Blue)
+		.OnClicked(this, &SAdvanceDeletionTab::OnDeselectAllButtonClicked);
+
+	Button->SetContent(ConstructTextForTabButtons(FText::FromString("Deselect All")));
 
 	return Button;
 }
