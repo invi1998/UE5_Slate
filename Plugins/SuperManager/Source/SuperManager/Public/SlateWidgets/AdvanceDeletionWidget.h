@@ -43,6 +43,8 @@ private:
 	TSharedPtr<SListView<TSharedPtr<FAssetData>>> ConstructedAssetListView;	// 资产列表视图
 	void RefreshAssetListView();	// 刷新资产列表视图
 
+#pragma region RowWidgetsForAssetListViews
+
 	// 生成资产列表的行
 	TSharedRef<ITableRow> OnGenerateRowForList(TSharedPtr<FAssetData> Item, const TSharedRef<STableViewBase>& OwnerTable);
 
@@ -59,6 +61,23 @@ private:
 	TSharedRef<SComboButton> OnGenerateCutPagesComboBox();
 
 	TSharedRef<SButton> OnGenerateNoBorderButton(const FText& ButtonText);
+
+#pragma endregion
+
+	// 全选按钮点击事件, 同时还需要传入按钮本身的引用
+	FReply OnSelectAllButtonClicked();
+	FReply OnDeleteSelectedButtonClicked();	// 删除选中按钮点击事件
+
+	TSharedRef<SButton> OnGenerateSelectAllToggleButton();	// 生成全选按钮（全选/取消全选）
+	TSharedRef<SButton> OnGenerateDeleteSelectedButton();	// 生成删除按钮
+
+	TSharedRef<STextBlock> ConstructTextForTabButtons(const FText& TextContent);	// 构建选项卡按钮文本
+
+	bool bIsAllSelected = false;	// 是否全选
+
+	TSharedPtr<SButton> SelectAllToggleButton;	// 全选按钮
+
+	FText CurrentSelectedToggleButtonText;	// 当前选中的按钮文本
 
 	int32 CurrentPage = 1;	// 当前页码
 

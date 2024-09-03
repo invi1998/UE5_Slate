@@ -46,6 +46,9 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 
 						+ SHorizontalBox::Slot()
 						.AutoWidth()
+						.HAlign(HAlign_Left)
+						.VAlign(VAlign_Center)
+						.FillWidth(0.2)
 						[
 							SNew(STextBlock)
 								.Text(FText::FromString("Asset Type:"))
@@ -53,6 +56,35 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 								.Justification(ETextJustify::Left)
 								.ColorAndOpacity(FLinearColor::White)
 						]
+
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						.HAlign(HAlign_Right)
+						.VAlign(VAlign_Center)
+						.FillWidth(0.8)
+						[
+							SNew(SHorizontalBox)
+
+								+ SHorizontalBox::Slot()
+								.AutoWidth()
+								.HAlign(HAlign_Right)
+								.VAlign(VAlign_Center)
+								.Padding(5.f)
+								[
+									OnGenerateSelectAllToggleButton()
+								]
+
+								+ SHorizontalBox::Slot()
+								.AutoWidth()
+								.HAlign(HAlign_Right)
+								.VAlign(VAlign_Center)
+								.Padding(5.f)
+								[
+									OnGenerateDeleteSelectedButton()
+								]
+						]
+
+						
 				]
 
 
@@ -91,20 +123,6 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 							OnGenerateCutPagesComboBox()
 						]
 				]
-
-				// 第五行 （底部按钮，用于执行删除操作）
-				+ SVerticalBox::Slot()
-				.AutoHeight()
-				[
-					SNew(SHorizontalBox)
-
-						+ SHorizontalBox::Slot()
-						.AutoWidth()
-						[
-							SNew(SButton)
-								.Text(FText::FromString("Delete"))
-						]
-				]
 		];
 }
 
@@ -128,6 +146,8 @@ void SAdvanceDeletionTab::RefreshAssetListView()
 	
 }
 
+#pragma region RowWidgetsForAssetListViews
+
 TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAssetData> Item, const TSharedRef<STableViewBase>& OwnerTable)
 {
 	if (!Item.IsValid())
@@ -146,6 +166,7 @@ TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAsse
 				.HAlign(HAlign_Left)
 				.VAlign(VAlign_Center)
 				.FillWidth(0.05)
+				.Padding(5.f)
 				[
 					OnGenerateCheckBox(Item)
 				]
@@ -153,7 +174,7 @@ TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAsse
 				// 第二列：资产类型（资产类名）
 				+ SHorizontalBox::Slot()
 				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Fill)
+				.VAlign(VAlign_Center)
 				.FillWidth(0.45)
 				[
 					OnGenerateTextBlockForRowWidget(Item->AssetClassPath.ToString(), FCoreStyle::Get().GetFontStyle("EmbossedText"))
@@ -162,7 +183,7 @@ TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAsse
 				// 第三列：资产名称
 				+ SHorizontalBox::Slot()
 				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Fill)
+				.VAlign(VAlign_Center)
 				.FillWidth(0.4)
 				[
 					OnGenerateTextBlockForRowWidget(Item->AssetName.ToString(), FCoreStyle::Get().GetFontStyle("EmbossedText"))
@@ -171,8 +192,9 @@ TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAsse
 				// 第四列：资产删除按钮
 				+ SHorizontalBox::Slot()
 				.HAlign(HAlign_Center)
-				.VAlign(VAlign_Fill)
+				.VAlign(VAlign_Center)
 				.FillWidth(0.1)
+				.Padding(5.f)
 				[
 					OnGenerateButtonForRowWidget(Item)
 				]
@@ -302,4 +324,72 @@ TSharedRef<SButton> SAdvanceDeletionTab::OnGenerateNoBorderButton(const FText& B
 
 	return Button;
 }
+
+FReply SAdvanceDeletionTab::OnSelectAllButtonClicked()
+{
+	bIsAllSelected = !bIsAllSelected;
+
+	// 更新按钮文本
+	CurrentSelectedToggleButtonText = bIsAllSelected ? FText::FromString("Cancel All") : FText::FromString("Select All");
+
+	if (SelectAllToggleButton.IsValid())
+	{
+		const FLinearColor ButtonColor = FLinearColor(195.f / 255.f, 248.f / 255.f, 236.f / 255.f, 1.f);
+		SelectAllToggleButton->SetContent(ConstructTextForTabButtons(CurrentSelectedToggleButtonText));
+		SelectAllToggleButton->SetColorAndOpacity(bIsAllSelected ? FLinearColor::White : ButtonColor);
+	}
+
+	return FReply::Handled();
+}
+
+FReply SAdvanceDeletionTab::OnDeleteSelectedButtonClicked()
+{
+	return FReply::Handled();
+}
+
+TSharedRef<SButton> SAdvanceDeletionTab::OnGenerateSelectAllToggleButton()
+{
+	const FLinearColor ButtonColor = FLinearColor(195.f / 255.f, 248.f / 255.f, 236.f / 255.f, 1.f);
+	TSharedRef<SButton> Button = SNew(SButton)
+		.ContentPadding(FMargin(5.f))
+		.ButtonColorAndOpacity(FLinearColor::Green)
+		.OnClicked(this, &SAdvanceDeletionTab::OnSelectAllButtonClicked);
+
+	CurrentSelectedToggleButtonText = bIsAllSelected ? FText::FromString("Cancel All") : FText::FromString("Select All");
+
+	Button->SetContent(ConstructTextForTabButtons(CurrentSelectedToggleButtonText));
+	Button->SetColorAndOpacity(bIsAllSelected ? FLinearColor::White : ButtonColor);
+
+	SelectAllToggleButton = Button.ToSharedPtr();
+
+	return Button;
+}
+
+TSharedRef<SButton> SAdvanceDeletionTab::OnGenerateDeleteSelectedButton()
+{
+	TSharedRef<SButton> Button = SNew(SButton)
+		.ContentPadding(FMargin(5.f))
+		.ButtonColorAndOpacity(FLinearColor::Red)
+		.OnClicked(this, &SAdvanceDeletionTab::OnDeleteSelectedButtonClicked);
+
+	Button->SetContent(ConstructTextForTabButtons(FText::FromString("Delete Selected")));
+
+	return Button;
+}
+
+TSharedRef<STextBlock> SAdvanceDeletionTab::ConstructTextForTabButtons(const FText& TextContent)
+{
+	FSlateFontInfo FontInfo = FCoreStyle::Get().GetFontStyle("EmbossedText");
+	FontInfo.Size = 16;
+
+	TSharedRef<STextBlock> TextBlock = SNew(STextBlock)
+		.Text(TextContent)
+		.Font(FontInfo)
+		.Justification(ETextJustify::Center)
+		.ColorAndOpacity(FLinearColor::White);
+
+	return TextBlock;
+}
+
+#pragma endregion
 
