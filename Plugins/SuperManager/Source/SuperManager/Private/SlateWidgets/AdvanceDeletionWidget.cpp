@@ -65,10 +65,7 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 						.ScrollBarAlwaysVisible(false)
 						+ SScrollBox::Slot()
 						[
-							SNew(SListView<TSharedPtr<FAssetData>>)	// 列表视图
-								.ItemHeight(24)
-								.ListItemsSource(&AssetDataUnderSelectedFolder)
-								.OnGenerateRow(this, &SAdvanceDeletionTab::OnGenerateRowForList)
+							OnConstructAssetListView()
 						]
 				]
 
@@ -109,6 +106,26 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 						]
 				]
 		];
+}
+
+TSharedRef<SListView<TSharedPtr<FAssetData>>> SAdvanceDeletionTab::OnConstructAssetListView()
+{
+	ConstructedAssetListView = SNew(SListView<TSharedPtr<FAssetData>>)
+		.ItemHeight(24)
+		.ListItemsSource(&AssetDataUnderSelectedFolder)
+		.OnGenerateRow(this, &SAdvanceDeletionTab::OnGenerateRowForList);
+
+	return ConstructedAssetListView.ToSharedRef();
+}
+
+void SAdvanceDeletionTab::RefreshAssetListView()
+{
+	if (ConstructedAssetListView.IsValid())
+	{
+		ConstructedAssetListView->RequestListRefresh();
+		// ConstructedAssetListView->RebuildList();
+	}
+	
 }
 
 TSharedRef<ITableRow> SAdvanceDeletionTab::OnGenerateRowForList(TSharedPtr<FAssetData> Item, const TSharedRef<STableViewBase>& OwnerTable)
@@ -211,7 +228,12 @@ FReply SAdvanceDeletionTab::OnRowDeleteButtonClicked(TSharedPtr<FAssetData> Asse
 	// 刷新表格
 	if (DelRet)
 	{
+		if (AssetDataUnderSelectedFolder.Contains(AssetData))
+		{
+			AssetDataUnderSelectedFolder.Remove(AssetData);
+		}
 		
+		RefreshAssetListView();
 	}
 
 	return FReply::Handled();
