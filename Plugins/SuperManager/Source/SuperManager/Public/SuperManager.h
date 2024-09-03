@@ -13,6 +13,8 @@ public:
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 
+	void FixUpRedirectors();	// 修复重定向器
+
 private:
 
 
@@ -30,8 +32,6 @@ private:
 	void OnDeleteEmptyFoldersButtonClicked();	// 删除空文件夹按钮点击事件
 
 	TArray<FString> SelectedFolderPaths;	// 选中的文件夹路径
-
-	void FixUpRedirectors();	// 修复重定向器
 
 	void OnAdvanceDeletionButtonClicked();	// 高级删除按钮点击事件
 

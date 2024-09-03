@@ -143,6 +143,12 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 		];
 }
 
+void SAdvanceDeletionTab::FixUpRedirectors()
+{
+	FSuperManagerModule& SuperManagerModule = FModuleManager::LoadModuleChecked<FSuperManagerModule>("SuperManager");
+	SuperManagerModule.FixUpRedirectors();
+}
+
 TSharedRef<SListView<TSharedPtr<FAssetData>>> SAdvanceDeletionTab::OnConstructAssetListView()
 {
 	ConstructedAssetListView = SNew(SListView<TSharedPtr<FAssetData>>)
@@ -157,6 +163,8 @@ void SAdvanceDeletionTab::RefreshAssetListView()
 {
 	CheckBoxList.Empty();
 	SelectedAssetDataList.Empty();
+
+	FixUpRedirectors();
 
 	if (ConstructedAssetListView.IsValid())
 	{
@@ -205,7 +213,7 @@ void SAdvanceDeletionTab::OnComboBoxSelectionChanged(TSharedPtr<FString> Selecte
 	// 更新按照选项筛选后的资产列表
 	if (*SelectedItem.Get() == LIST_ALL)
 	{
-		// DisplayedAssetDataList = AssetDataUnderSelectedFolder;
+		DisplayedAssetDataList = AssetDataUnderSelectedFolder;
 	}
 	else if (*SelectedItem.Get() == LIST_UNUSED)
 	{
@@ -213,12 +221,10 @@ void SAdvanceDeletionTab::OnComboBoxSelectionChanged(TSharedPtr<FString> Selecte
 
 		FSuperManagerModule& SuperManagerModule = FModuleManager::LoadModuleChecked<FSuperManagerModule>("SuperManager");
 		SuperManagerModule.GetUnusedAssets(DisplayedAssetDataList, AssetDataUnderSelectedFolder);
-
-		RefreshAssetListView();
-
 	}
 
-	
+	RefreshAssetListView();
+
 }
 
 #pragma endregion
@@ -349,6 +355,11 @@ FReply SAdvanceDeletionTab::OnRowDeleteButtonClicked(TSharedPtr<FAssetData> Asse
 		{
 			AssetDataUnderSelectedFolder.Remove(AssetData);
 		}
+
+		if (DisplayedAssetDataList.Contains(AssetData))
+		{
+			DisplayedAssetDataList.Remove(AssetData);
+		}
 		
 		RefreshAssetListView();
 	}
@@ -430,6 +441,11 @@ FReply SAdvanceDeletionTab::OnDeleteSelectedButtonClicked()
 			if (AssetDataUnderSelectedFolder.Contains(AssetData))
 			{
 				AssetDataUnderSelectedFolder.Remove(AssetData);
+			}
+
+			if (DisplayedAssetDataList.Contains(AssetData))
+			{
+				DisplayedAssetDataList.Remove(AssetData);
 			}
 		}
 

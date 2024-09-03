@@ -294,6 +294,8 @@ TSharedRef<SDockTab> FSuperManagerModule::OnSpawnAdvancedDeletionTab(const FSpaw
 
 TArray<TSharedPtr<FAssetData>> FSuperManagerModule::GetAllAssetDatasUnderSelectedFolder()
 {
+	FixUpRedirectors();
+
 	// 获取此文件夹下的所有资产数据
 	TArray<TSharedPtr<FAssetData>> AssetDataList;
 

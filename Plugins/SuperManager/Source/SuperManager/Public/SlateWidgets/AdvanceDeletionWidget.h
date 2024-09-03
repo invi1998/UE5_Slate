@@ -21,6 +21,8 @@ public:
 	/** Constructs this widget with InArgs */
 	void Construct(const FArguments& InArgs);
 
+	void FixUpRedirectors();	// 修复重定向器
+
 private:
 	TArray<TSharedPtr<FAssetData>> AssetDataUnderSelectedFolder;	// 选中文件夹下的资产数据
 	TArray<TSharedPtr<FAssetData>> DisplayedAssetDataList;	// 显示的资产数据列表
