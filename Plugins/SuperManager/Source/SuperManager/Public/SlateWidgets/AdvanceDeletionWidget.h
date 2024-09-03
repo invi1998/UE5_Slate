@@ -4,21 +4,6 @@
 
 #include "Widgets/SCompoundWidget.h"
 
-// 定义一个数据模型，用于存储下拉框中的选项
-struct FDropdownOption
-{
-	FText DisplayText;
-	FString Value;
-
-	FDropdownOption(const FText& InDisplayText, const FString& InValue)
-		: DisplayText(InDisplayText), Value(InValue)
-	{}
-
-	bool operator==(const FDropdownOption& Other) const
-	{
-		return Value == Other.Value;
-	}
-};
 
 class SAdvanceDeletionTab : public SCompoundWidget
 {
@@ -43,6 +28,20 @@ private:
 	TSharedPtr<SListView<TSharedPtr<FAssetData>>> ConstructedAssetListView;	// 资产列表视图
 	void RefreshAssetListView();	// 刷新资产列表视图
 
+#pragma region ComboBoxForListingConditions
+
+	TSharedRef<SComboBox<TSharedPtr<FString>>> OnConstructComboBox();	// 构建下拉框
+
+	TSharedRef<SWidget> OnConstructComboBoxWidget(TSharedPtr<FString> Item);	// 构建下拉框部件
+
+	void OnComboBoxSelectionChanged(TSharedPtr<FString> SelectedItem, ESelectInfo::Type SelectInfo);	// 下拉框选项改变事件
+
+	TSharedPtr<STextBlock> ComboDisplayTextBlock;	// 下拉框文本部件
+
+	TArray<TSharedPtr<FString>> ComboBoxSourceItems;	// 下拉框选项列表
+
+#pragma endregion
+
 #pragma region RowWidgetsForAssetListViews
 
 	// 生成资产列表的行
@@ -57,10 +56,6 @@ private:
 	FReply OnRowDeleteButtonClicked(TSharedPtr<FAssetData> AssetData);
 
 	TSharedRef<SButton> OnGenerateButtonForRowWidget(const TSharedPtr<FAssetData>& Item);
-
-	TSharedRef<SComboButton> OnGenerateCutPagesComboBox();
-
-	TSharedRef<SButton> OnGenerateNoBorderButton(const FText& ButtonText);
 
 #pragma endregion
 
@@ -77,13 +72,11 @@ private:
 
 	TSharedRef<STextBlock> ConstructTextForTabButtons(const FText& TextContent);	// 构建选项卡按钮文本
 
-	int32 CurrentPage = 1;	// 当前页码
-
-	int32 OnePageCount = 10;	// 每页显示数量
-
 	TArray<TSharedPtr<FAssetData>> SelectedAssetDataList;	// 选中的资产数据列表
 	TArray<TSharedRef<SCheckBox>> CheckBoxList;	// 复选框列表
 
 #pragma endregion
+
+
 };
 

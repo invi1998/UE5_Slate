@@ -7,6 +7,8 @@
 #include "SuperManager.h"
 
 
+#define LIST_ALL TEXT("List All")
+
 void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 {
 	bCanSupportFocus = true;	// 设置焦点
@@ -25,6 +27,10 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 	FSlateFontInfo SmallFontInfo = FCoreStyle::Get().GetFontStyle("EmbossedText");
 	SmallFontInfo.Size = 8;
 
+	ComboBoxSourceItems.Empty();
+
+	ComboBoxSourceItems.Add(MakeShared<FString>(LIST_ALL));
+
 	ChildSlot
 		[
 			// 垂直布局
@@ -41,6 +47,17 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 						.ColorAndOpacity(FLinearColor::White)
 				]
 
+				// 分割线
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.Padding(5.f)
+				[
+					SNew(SSeparator)
+						.Orientation(Orient_Horizontal)
+						.Thickness(2.f)
+						.ColorAndOpacity(FLinearColor::White)
+				]
+
 				// 第二行 （下拉菜单，用于筛选资产）
 				+ SVerticalBox::Slot()
 				.AutoHeight()
@@ -53,11 +70,14 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 						.VAlign(VAlign_Center)
 						.FillWidth(0.2)
 						[
-							SNew(STextBlock)
-								.Text(FText::FromString("Asset Type:"))
-								.Font(NormalFontInfo)
-								.Justification(ETextJustify::Left)
-								.ColorAndOpacity(FLinearColor::White)
+							SNew(SHorizontalBox)
+
+								// ComboBox
+								+ SHorizontalBox::Slot()
+								.AutoWidth()
+								[
+									OnConstructComboBox()
+								]
 						]
 
 						+ SHorizontalBox::Slot()
@@ -113,28 +133,6 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 						]
 				]
 
-				// 第四行 （显示资产数量，显示分页按钮，前往第一页，前往上一页，前往下一页，前往最后一页）
-				+ SVerticalBox::Slot()
-				.AutoHeight()
-				[
-					SNew(SHorizontalBox)
-
-						+ SHorizontalBox::Slot()
-						.AutoWidth()
-						[
-							SNew(STextBlock)
-								.Text(FText::FromString("Total: " + FString::FromInt(AssetDataUnderSelectedFolder.Num())))
-								.Font(SmallFontInfo)
-								.Justification(ETextJustify::Left)
-								.ColorAndOpacity(FLinearColor::White)
-						]
-
-						+ SHorizontalBox::Slot()
-						.AutoWidth()
-						[
-							OnGenerateCutPagesComboBox()
-						]
-				]
 		];
 }
 
@@ -160,6 +158,47 @@ void SAdvanceDeletionTab::RefreshAssetListView()
 	}
 	
 }
+
+
+
+#pragma region ComboBoxForListingConditions
+
+TSharedRef<SComboBox<TSharedPtr<FString>>> SAdvanceDeletionTab::OnConstructComboBox()
+{
+	TSharedRef<SComboBox<TSharedPtr<FString>>> ConstructedComboBox =
+		SNew(SComboBox<TSharedPtr<FString>>)
+		.OptionsSource(&ComboBoxSourceItems)
+		.OnGenerateWidget(this, &SAdvanceDeletionTab::OnConstructComboBoxWidget)
+		.OnSelectionChanged(this, &SAdvanceDeletionTab::OnComboBoxSelectionChanged)
+		[
+			SAssignNew(ComboDisplayTextBlock, STextBlock)
+				.Text(FText::FromString(TEXT("List Assets Option")))
+		];
+
+	return ConstructedComboBox;
+}
+
+TSharedRef<SWidget> SAdvanceDeletionTab::OnConstructComboBoxWidget(TSharedPtr<FString> Item)
+{
+	TSharedRef<STextBlock> TextBlock = SNew(STextBlock)
+		.Text(FText::FromString(*Item.Get()));
+
+	return TextBlock;
+}
+
+void SAdvanceDeletionTab::OnComboBoxSelectionChanged(TSharedPtr<FString> SelectedItem, ESelectInfo::Type SelectInfo)
+{
+	if (!SelectedItem.IsValid())
+	{
+		return;
+	}
+
+	ComboDisplayTextBlock->SetText(FText::FromString(*SelectedItem.Get()));
+	
+}
+
+#pragma endregion
+
 
 #pragma region RowWidgetsForAssetListViews
 
@@ -302,60 +341,6 @@ TSharedRef<SButton> SAdvanceDeletionTab::OnGenerateButtonForRowWidget(const TSha
 	return Button;
 }
 
-TSharedRef<SComboButton> SAdvanceDeletionTab::OnGenerateCutPagesComboBox()
-{
-	TSharedRef<SComboButton> ComboButton = SNew(SComboButton)
-		.HasDownArrow(true)
-		.ButtonStyle(FCoreStyle::Get(), "SimpleButton")
-		.ButtonContent()
-		[
-			SNew(STextBlock)
-				.Text(FText::FromString("10 articles / per page"))
-				.Font(FCoreStyle::Get().GetFontStyle("EmbossedText"))
-				.ColorAndOpacity(FLinearColor::White)
-		]
-		.ContentPadding(FMargin(5.0f))
-		.MenuContent()
-		[
-			SNew(SVerticalBox)
-
-				+ SVerticalBox::Slot()
-				.AutoHeight()
-				[
-					OnGenerateNoBorderButton(FText::FromString("10 articles / per page"))
-				]
-
-				+ SVerticalBox::Slot()
-				.AutoHeight()
-				[
-					OnGenerateNoBorderButton(FText::FromString("50 articles / per page"))
-				]
-
-				+ SVerticalBox::Slot()
-				.AutoHeight()
-				[
-					OnGenerateNoBorderButton(FText::FromString("100 articles / per page"))
-				]
-
-				+ SVerticalBox::Slot()
-				.AutoHeight()
-				[
-					OnGenerateNoBorderButton(FText::FromString("All articles / per page"))
-				]
-		];
-
-	return ComboButton;
-}
-
-TSharedRef<SButton> SAdvanceDeletionTab::OnGenerateNoBorderButton(const FText& ButtonText)
-{
-	TSharedRef<SButton> Button = SNew(SButton)
-		.Text(ButtonText)
-		.ButtonStyle(FCoreStyle::Get(), "NoBorder")
-		.ForegroundColor(FLinearColor::Gray);
-
-	return Button;
-}
 
 #pragma endregion
 
