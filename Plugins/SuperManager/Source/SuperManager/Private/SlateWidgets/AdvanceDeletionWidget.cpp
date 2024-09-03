@@ -355,6 +355,8 @@ void SAdvanceDeletionTab::OnComboBoxSelectionChanged(TSharedPtr<FString> Selecte
 	if (*SelectedItem.Get() == LIST_ALL)
 	{
 		DisplayedAssetDataList = AssetDataUnderSelectedFolder;
+
+		RefreshAssetListView();
 	}
 	else if (*SelectedItem.Get() == LIST_UNUSED)
 	{
@@ -362,6 +364,8 @@ void SAdvanceDeletionTab::OnComboBoxSelectionChanged(TSharedPtr<FString> Selecte
 
 		FSuperManagerModule& SuperManagerModule = FModuleManager::LoadModuleChecked<FSuperManagerModule>("SuperManager");
 		SuperManagerModule.GetUnusedAssets(DisplayedAssetDataList, AssetDataUnderSelectedFolder);
+
+		RefreshAssetListView();
 	}
 	else if (*SelectedItem.Get() == LIST_SAME_NAME)
 	{
@@ -387,9 +391,11 @@ void SAdvanceDeletionTab::OnComboBoxSelectionChanged(TSharedPtr<FString> Selecte
 				DisplayedAssetDataList.Add(AssetData);
 			}
 		}
+
+		RefreshAssetListView();
 	}
 
-	RefreshAssetListView();
+	
 
 }
 
