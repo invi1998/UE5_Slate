@@ -219,14 +219,26 @@ void SAdvanceDeletionTab::OnCheckBoxStateChanged(ECheckBoxState NewState, TShare
 	switch (NewState)
 	{
 	case ECheckBoxState::Unchecked:
-		SM_Debug::PrintDebug(Item->AssetName.ToString() + " is unchecked.", FColor::Red);
-		break;
+		{
+			if (SelectedAssetDataList.Contains(Item))
+			{
+				SelectedAssetDataList.Remove(Item);
+			}
+			break;
+		}
 	case ECheckBoxState::Checked:
-		SM_Debug::PrintDebug(Item->AssetName.ToString() + " is checked.", FColor::Green);
-		break;
-	case ECheckBoxState::Undetermined:
-		SM_Debug::PrintDebug(Item->AssetName.ToString() + " is undetermined.", FColor::Yellow);
-		break;
+		{
+			if (!SelectedAssetDataList.Contains(Item))
+			{
+				SelectedAssetDataList.Add(Item);
+			}
+			break;
+		}
+	case ECheckBoxState::Undetermined:		// 未确定
+		if (SelectedAssetDataList.Contains(Item))
+		{
+			SelectedAssetDataList.Remove(Item);
+		}
 	default:
 		break;
 	}
@@ -325,6 +337,11 @@ TSharedRef<SButton> SAdvanceDeletionTab::OnGenerateNoBorderButton(const FText& B
 	return Button;
 }
 
+#pragma endregion
+
+
+#pragma region TabButtons
+
 FReply SAdvanceDeletionTab::OnSelectAllButtonClicked()
 {
 	bIsAllSelected = !bIsAllSelected;
@@ -344,6 +361,33 @@ FReply SAdvanceDeletionTab::OnSelectAllButtonClicked()
 
 FReply SAdvanceDeletionTab::OnDeleteSelectedButtonClicked()
 {
+	if (SelectedAssetDataList.Num() <= 0)
+	{
+		return FReply::Handled();
+	}
+
+	FSuperManagerModule& SuperManagerModule = FModuleManager::LoadModuleChecked<FSuperManagerModule>("SuperManager");
+	TArray<FAssetData> SelectedAssetDataArray;
+	for (const TSharedPtr<FAssetData>& AssetData : SelectedAssetDataList)
+	{
+		SelectedAssetDataArray.Add(*AssetData.Get());
+	}
+
+	if (SuperManagerModule.DeleteAssets(SelectedAssetDataArray))
+	{
+		// 刷新表格
+		for (const TSharedPtr<FAssetData>& AssetData : SelectedAssetDataList)
+		{
+			if (AssetDataUnderSelectedFolder.Contains(AssetData))
+			{
+				AssetDataUnderSelectedFolder.Remove(AssetData);
+			}
+		}
+
+		RefreshAssetListView();
+	}
+
+
 	return FReply::Handled();
 }
 

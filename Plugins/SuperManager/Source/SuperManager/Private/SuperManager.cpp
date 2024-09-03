@@ -343,6 +343,12 @@ bool FSuperManagerModule::DeleteSingleAsset(const FAssetData& AssetData)
 	return ObjectTools::DeleteAssets(AssetDataArray, true) > 0;
 }
 
+bool FSuperManagerModule::DeleteAssets(const TArray<FAssetData>& AssetDatas)
+{
+	// 删除资产
+	return ObjectTools::DeleteAssets(AssetDatas, true) > 0;
+}
+
 #pragma endregion
 
 

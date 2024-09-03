@@ -64,6 +64,8 @@ private:
 
 #pragma endregion
 
+
+#pragma region TabButtons
 	// 全选按钮点击事件, 同时还需要传入按钮本身的引用
 	FReply OnSelectAllButtonClicked();
 	FReply OnDeleteSelectedButtonClicked();	// 删除选中按钮点击事件
@@ -82,5 +84,9 @@ private:
 	int32 CurrentPage = 1;	// 当前页码
 
 	int32 OnePageCount = 10;	// 每页显示数量
+
+	TArray<TSharedPtr<FAssetData>> SelectedAssetDataList;	// 选中的资产数据列表
+
+#pragma endregion
 };
 
