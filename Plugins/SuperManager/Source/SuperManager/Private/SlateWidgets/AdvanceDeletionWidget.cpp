@@ -251,6 +251,8 @@ TSharedRef<SButton> SAdvanceDeletionTab::OnGenerateButtonForRowWidget(const TSha
 TSharedRef<SComboButton> SAdvanceDeletionTab::OnGenerateCutPagesComboBox()
 {
 	TSharedRef<SComboButton> ComboButton = SNew(SComboButton)
+		.HasDownArrow(true)
+		.ButtonStyle(FCoreStyle::Get(), "SimpleButton")
 		.ButtonContent()
 		[
 			SNew(STextBlock)
