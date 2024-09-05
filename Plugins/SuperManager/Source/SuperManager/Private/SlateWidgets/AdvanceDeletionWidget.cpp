@@ -25,6 +25,8 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 	CheckBoxList.Empty();
 	SelectedAssetDataList.Empty();
 
+	AssetDataToCheckBoxMap.Empty();
+
 	FSlateFontInfo TitleFontInfo = FCoreStyle::Get().GetFontStyle("EmbossedText");
 	TitleFontInfo.Size = 24;
 
@@ -316,12 +318,28 @@ void SAdvanceDeletionTab::OnDoubleClickAssetItem(TSharedPtr<FAssetData> AssetDat
 	FSuperManagerModule::SyncCBToClickedForAssetList(AssetData->GetObjectPathString());
 }
 
+void SAdvanceDeletionTab::OnClickAssetItem(TSharedPtr<FAssetData, ESPMode::ThreadSafe> AssetData)
+{
+	// 依据点击的资产项，拿到该行的复选框
+	if (AssetDataToCheckBoxMap.Contains(AssetData))
+	{
+		const TSharedPtr<SCheckBox> CheckBox = AssetDataToCheckBoxMap[AssetData];
+		if (CheckBox.IsValid())
+		{
+			CheckBox->ToggleCheckedState();
+		}
+	}
+}
+
 TSharedRef<SListView<TSharedPtr<FAssetData>>> SAdvanceDeletionTab::OnConstructAssetListView()
 {
+	AssetDataToCheckBoxMap.Empty();
+
 	ConstructedAssetListView = SNew(SListView<TSharedPtr<FAssetData>>)
 		.ItemHeight(24)
 		.ListItemsSource(&DisplayedAssetDataList)
 		.OnGenerateRow(this, &SAdvanceDeletionTab::OnGenerateRowForList)
+		.OnMouseButtonClick(this, &SAdvanceDeletionTab::OnClickAssetItem)
 		.OnMouseButtonDoubleClick(this, &SAdvanceDeletionTab::OnDoubleClickAssetItem);
 
 	return ConstructedAssetListView.ToSharedRef();
@@ -331,6 +349,7 @@ void SAdvanceDeletionTab::RefreshAssetListView()
 {
 	CheckBoxList.Empty();
 	SelectedAssetDataList.Empty();
+	AssetDataToCheckBoxMap.Empty();
 
 	FixUpRedirectors();
 
@@ -526,6 +545,11 @@ TSharedRef<SCheckBox> SAdvanceDeletionTab::OnGenerateCheckBox(const TSharedPtr<F
 	if (!CheckBoxList.Contains(CheckBox))
 	{
 		CheckBoxList.Add(CheckBox);
+	}
+
+	if (!AssetDataToCheckBoxMap.Contains(Item))
+	{
+		AssetDataToCheckBoxMap.Add(Item, CheckBox);
 	}
 
 	return CheckBox;

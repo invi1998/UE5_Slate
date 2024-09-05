@@ -29,6 +29,7 @@ private:
 	TArray<TSharedPtr<FAssetData>> DisplayedAssetDataList;	// 显示的资产数据列表
 
 	void OnDoubleClickAssetItem(TSharedPtr<FAssetData> AssetData);	// 双击资产项事件
+	void OnClickAssetItem(TSharedPtr<FAssetData, ESPMode::ThreadSafe> AssetData);	// 点击资产项事件（单击表行选中或者取消选中）
 	TSharedRef<SListView<TSharedPtr<FAssetData>>> OnConstructAssetListView();	// 构建资产列表视图
 	TSharedPtr<SListView<TSharedPtr<FAssetData>>> ConstructedAssetListView;	// 资产列表视图
 	void RefreshAssetListView();	// 刷新资产列表视图
@@ -81,6 +82,8 @@ private:
 
 	TArray<TSharedPtr<FAssetData>> SelectedAssetDataList;	// 选中的资产数据列表
 	TArray<TSharedRef<SCheckBox>> CheckBoxList;	// 复选框列表
+
+	TMap<TSharedPtr<FAssetData>, TSharedRef<SCheckBox>> AssetDataToCheckBoxMap;	// 资产数据到复选框的映射
 
 #pragma endregion
 
