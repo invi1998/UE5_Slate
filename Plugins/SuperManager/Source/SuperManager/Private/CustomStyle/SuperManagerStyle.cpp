@@ -23,6 +23,11 @@ void FSuperManagerStyle::InitializeIcons()
 
 void FSuperManagerStyle::Shutdown()
 {
+	if (CustomSlateStyleSet.IsValid())
+	{
+		FSlateStyleRegistry::UnRegisterSlateStyle(*CustomSlateStyleSet);
+		CustomSlateStyleSet.Reset();
+	}
 }
 
 TSharedRef<FSlateStyleSet> FSuperManagerStyle::CreateSlateStyleSet()
