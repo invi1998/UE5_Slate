@@ -34,6 +34,8 @@ TSharedRef<FSlateStyleSet> FSuperManagerStyle::CreateSlateStyleSet()
 	const FString IconDir = PluginManager.FindPlugin(TEXT("SuperManager"))->GetBaseDir() / TEXT("Resources");
 
 	Style->Set("ContentBrowser.DeleteUnusedAssets", new FSlateImageBrush(IconDir / TEXT("DeleteUnusedAsset.png"), FVector2D(16.0f, 16.0f)));
+	Style->Set("ContentBrowser.DeleteEmptyFolders", new FSlateImageBrush(IconDir / TEXT("DeleteEmptyFolders.png"), FVector2D(16.0f, 16.0f)));
+	Style->Set("ContentBrowser.AdvanceDeletion", new FSlateImageBrush(IconDir / TEXT("AdvanceDeletion.png"), FVector2D(16.0f, 16.0f)));
 
 	return Style;
 }

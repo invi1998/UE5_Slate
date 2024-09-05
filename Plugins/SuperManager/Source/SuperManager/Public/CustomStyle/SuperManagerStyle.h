@@ -12,6 +12,11 @@ public:
 
 	static void Shutdown();
 
+	static FName GetStyleSetName()
+	{
+		return StyleSetName;
+	}
+
 private:
 	static FName StyleSetName;
 

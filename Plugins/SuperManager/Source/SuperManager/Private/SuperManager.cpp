@@ -11,12 +11,14 @@
 #include "ObjectTools.h"
 #include "SlateWidgets/AdvanceDeletionWidget.h"
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "CustomStyle/SuperManagerStyle.h"
 
 #define LOCTEXT_NAMESPACE "FSuperManagerModule"
 
 void FSuperManagerModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
+	FSuperManagerStyle::InitializeIcons();	// 初始化图标
 
 	InitCBMenuExtender();
 
@@ -72,21 +74,21 @@ void FSuperManagerModule::OnAddCBMenuEntry(FMenuBuilder& MenuBuilder)
 	MenuBuilder.AddMenuEntry(
 		LOCTEXT("Delete Unused Assets", "删除未使用的资产"),
 		LOCTEXT("Safely Delete", "安全删除当前文件夹下所有未使用到的资产"),
-		FSlateIcon(),
+		FSlateIcon(FSuperManagerStyle::GetStyleSetName(), "ContentBrowser.DeleteUnusedAssets"),
 		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteUnusedAssetsButtonClicked)
 	);
 
 	MenuBuilder.AddMenuEntry(
 		LOCTEXT("Delete Empty Folders", "删除空文件夹"),
 		LOCTEXT("Safely Delete", "安全删除当前文件夹下所有空文件夹"),
-		FSlateIcon(),
+		FSlateIcon(FSuperManagerStyle::GetStyleSetName(), "ContentBrowser.DeleteEmptyFolders"),
 		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteEmptyFoldersButtonClicked)
 	);
 
 	MenuBuilder.AddMenuEntry(
 		LOCTEXT("Advance Deletion", "高级删除"),
 		LOCTEXT("List assets by specific conditions in a table and delete them", "按照特定条件在表格中列出资产并删除"),
-		FSlateIcon(),
+		FSlateIcon(FSuperManagerStyle::GetStyleSetName(), "ContentBrowser.AdvanceDeletion"),
 		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnAdvanceDeletionButtonClicked)
 	);
 
