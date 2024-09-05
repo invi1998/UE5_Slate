@@ -290,12 +290,18 @@ void SAdvanceDeletionTab::FixUpRedirectors()
 	SuperManagerModule.FixUpRedirectors();
 }
 
+void SAdvanceDeletionTab::OnDoubleClickAssetItem(TSharedPtr<FAssetData> AssetData)
+{
+	FSuperManagerModule::SyncCBToClickedForAssetList(AssetData->GetObjectPathString());
+}
+
 TSharedRef<SListView<TSharedPtr<FAssetData>>> SAdvanceDeletionTab::OnConstructAssetListView()
 {
 	ConstructedAssetListView = SNew(SListView<TSharedPtr<FAssetData>>)
 		.ItemHeight(24)
 		.ListItemsSource(&DisplayedAssetDataList)
-		.OnGenerateRow(this, &SAdvanceDeletionTab::OnGenerateRowForList);
+		.OnGenerateRow(this, &SAdvanceDeletionTab::OnGenerateRowForList)
+		.OnMouseButtonDoubleClick(this, &SAdvanceDeletionTab::OnDoubleClickAssetItem);
 
 	return ConstructedAssetListView.ToSharedRef();
 }
@@ -362,8 +368,8 @@ void SAdvanceDeletionTab::OnComboBoxSelectionChanged(TSharedPtr<FString> Selecte
 	{
 		DisplayedAssetDataList.Empty();
 
-		FSuperManagerModule& SuperManagerModule = FModuleManager::LoadModuleChecked<FSuperManagerModule>("SuperManager");
-		SuperManagerModule.GetUnusedAssets(DisplayedAssetDataList, AssetDataUnderSelectedFolder);
+		// FSuperManagerModule& SuperManagerModule = FModuleManager::LoadModuleChecked<FSuperManagerModule>("SuperManager");
+		FSuperManagerModule::GetUnusedAssets(DisplayedAssetDataList, AssetDataUnderSelectedFolder);
 
 		RefreshAssetListView();
 	}
@@ -526,8 +532,8 @@ TSharedRef<STextBlock> SAdvanceDeletionTab::OnGenerateTextBlockForRowWidget(cons
 
 FReply SAdvanceDeletionTab::OnRowDeleteButtonClicked(TSharedPtr<FAssetData> AssetData)
 {
-	FSuperManagerModule& SuperManagerModule = FModuleManager::LoadModuleChecked<FSuperManagerModule>("SuperManager");
-	const bool DelRet = SuperManagerModule.DeleteSingleAsset(*AssetData.Get());
+	// FSuperManagerModule& SuperManagerModule = FModuleManager::LoadModuleChecked<FSuperManagerModule>("SuperManager");
+	const bool DelRet = FSuperManagerModule::DeleteSingleAsset(*AssetData.Get());
 
 	// 刷新表格
 	if (DelRet)
@@ -607,14 +613,14 @@ FReply SAdvanceDeletionTab::OnDeleteSelectedButtonClicked()
 		return FReply::Handled();
 	}
 
-	FSuperManagerModule& SuperManagerModule = FModuleManager::LoadModuleChecked<FSuperManagerModule>("SuperManager");
+	// FSuperManagerModule& SuperManagerModule = FModuleManager::LoadModuleChecked<FSuperManagerModule>("SuperManager");
 	TArray<FAssetData> SelectedAssetDataArray;
 	for (const TSharedPtr<FAssetData>& AssetData : SelectedAssetDataList)
 	{
 		SelectedAssetDataArray.Add(*AssetData.Get());
 	}
 
-	if (SuperManagerModule.DeleteAssets(SelectedAssetDataArray))
+	if (FSuperManagerModule::DeleteAssets(SelectedAssetDataArray))
 	{
 		// 刷新表格
 		for (const TSharedPtr<FAssetData>& AssetData : SelectedAssetDataList)

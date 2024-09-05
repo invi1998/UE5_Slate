@@ -365,6 +365,15 @@ void FSuperManagerModule::GetUnusedAssets(TArray<TSharedPtr<FAssetData>>& OutArr
 	}
 }
 
+void FSuperManagerModule::SyncCBToClickedForAssetList(const FString& AssetPath)
+{
+	// 同步内容浏览器到点击的资产列表
+	TArray<FString> AssetPaths;
+	AssetPaths.Add(AssetPath);
+
+	UEditorAssetLibrary::SyncBrowserToObjects(AssetPaths);
+}
+
 #pragma endregion
 
 
