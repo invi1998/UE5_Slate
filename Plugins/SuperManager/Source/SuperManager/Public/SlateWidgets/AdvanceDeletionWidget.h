@@ -14,6 +14,7 @@ class SAdvanceDeletionTab : public SCompoundWidget
 
 	// SLATE_ARGUMENT 宏用于定义构造函数的参数
 	SLATE_ARGUMENT(TArray<TSharedPtr<FAssetData>>, AssetDataList)
+	SLATE_ARGUMENT(FString, CurrentSelectedFolderPath)
 
 	SLATE_END_ARGS()
 
@@ -39,6 +40,8 @@ private:
 	TSharedRef<SWidget> OnConstructComboBoxWidget(TSharedPtr<FString> Item);	// 构建下拉框部件
 
 	void OnComboBoxSelectionChanged(TSharedPtr<FString> SelectedItem, ESelectInfo::Type SelectInfo);	// 下拉框选项改变事件
+
+	TSharedRef<SButton> GenerateComboBoxHelper();	// 生成下拉框帮助
 
 	TSharedPtr<STextBlock> ComboDisplayTextBlock;	// 下拉框文本部件
 

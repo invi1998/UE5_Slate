@@ -56,6 +56,18 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 						.ColorAndOpacity(FLinearColor::White)
 				]
 
+				// 展示当前选中的文件夹路径
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.Padding(5.f)
+				[
+					SNew(STextBlock)
+						.Text(FText::FromString("Current Selected Folder Path: " + InArgs._CurrentSelectedFolderPath))
+						.Font(SmallFontInfo)
+						.Justification(ETextJustify::Center)
+						.ColorAndOpacity(FLinearColor::Gray)
+				]
+
 				// 分割线
 				+ SVerticalBox::Slot()
 				.AutoHeight()
@@ -77,15 +89,24 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 						.AutoWidth()
 						.HAlign(HAlign_Left)
 						.VAlign(VAlign_Center)
-						.FillWidth(0.2)
+						.FillWidth(0.3)
 						[
 							SNew(SHorizontalBox)
 
 								// ComboBox
 								+ SHorizontalBox::Slot()
 								.AutoWidth()
+								.Padding(5.f)
 								[
 									OnConstructComboBox()
+								]
+
+								// 帮助文本
+								+ SHorizontalBox::Slot()
+								.AutoWidth()
+								.Padding(5.f)
+								[
+									GenerateComboBoxHelper()
 								]
 						]
 
@@ -93,7 +114,7 @@ void SAdvanceDeletionTab::Construct(const FArguments& InArgs)
 						.AutoWidth()
 						.HAlign(HAlign_Right)
 						.VAlign(VAlign_Center)
-						.FillWidth(0.8)
+						.FillWidth(0.7)
 						[
 							SNew(SHorizontalBox)
 
@@ -400,9 +421,29 @@ void SAdvanceDeletionTab::OnComboBoxSelectionChanged(TSharedPtr<FString> Selecte
 
 		RefreshAssetListView();
 	}
+}
 
-	
+TSharedRef<SButton> SAdvanceDeletionTab::GenerateComboBoxHelper()
+{
+	//// 创建一个提示图标（按钮），用户点击后会显示提示信息
+	//TSharedRef<SToolTip> HelperToolTip = SNew(SToolTip)
+	//	[
+	//		SNew(STextBlock)
+	//			.Text(FText::FromString("List All Assets: List all assets under selected folder.\nList Unused Assets: List all unused assets under selected folder.\nList Same Name Assets: List all assets with same name under selected folder."))
+	//			.Justification(ETextJustify::Center)
+	//			.ColorAndOpacity(FLinearColor::White)
+	//	];
 
+	TSharedRef<SButton> HelperButton = SNew(SButton)
+		.ContentPadding(FMargin(5.f))
+		.ButtonStyle(FAppStyle::Get(), "NoBorder") // 使用无边框样式
+		.Text(FText::FromString("?"));
+
+	HelperButton->SetToolTipText(FText::FromString("List All Assets: List all assets under selected folder.\n"
+												"List Unused Assets: List all unused assets under selected folder.\n"
+												"List Same Name Assets: List all assets with same name under selected folder."));
+
+	return HelperButton;
 }
 
 #pragma endregion
