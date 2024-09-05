@@ -33,7 +33,7 @@ public class SuperManager : ModuleRules
 				"UnrealEd",
 				"ContentBrowser",
 				"InputCore",
-				// ... add other public dependencies that you statically link with here ...
+                // ... add other public dependencies that you statically link with here ...
 			}
 			);
 			
