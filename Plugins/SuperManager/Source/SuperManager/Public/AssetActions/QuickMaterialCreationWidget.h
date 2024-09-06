@@ -19,7 +19,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuickMaterialCreationCore")
 	void CreateMaterialFromSelectedTextures();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CreateMaterialFromSelectedTextures")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CreateMaterialFromSelectedTextures", meta = (EditCondition = "bUserSetMaterialName"))
 	FString MaterialName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CreateMaterialFromSelectedTextures")
