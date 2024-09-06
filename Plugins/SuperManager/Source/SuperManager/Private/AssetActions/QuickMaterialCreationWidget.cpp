@@ -3,6 +3,7 @@
 
 #include "AssetActions/QuickMaterialCreationWidget.h"
 #include "DebugHeader.h"
+#include "EditorAssetLibrary.h"
 #include "EditorUtilityLibrary.h"
 
 #pragma region QuickMaterialCreationCore
@@ -27,6 +28,13 @@ void UQuickMaterialCreationWidget::CreateMaterialFromSelectedTextures()
 	FString SelectedTextureFolderPath;
 
 	if (!ProcessSelectedData(SelectedAssetsData, SelectedTexturesArray, SelectedTextureFolderPath))
+	{
+		SelectedTexturesArray.Empty();
+		SelectedTextureFolderPath.Empty();
+		return;
+	}
+
+	if (!CheckIfNameIsValid(MaterialName, SelectedTextureFolderPath))
 	{
 		SelectedTexturesArray.Empty();
 		SelectedTextureFolderPath.Empty();
@@ -79,14 +87,39 @@ bool UQuickMaterialCreationWidget::ProcessSelectedData(const TArray<FAssetData>&
 			}
 			else
 			{
-				SM_Debug::ShowMessageDialog(FText::FromString("Selected Asset is not a Texture!"), FText::FromString("Error"), EAppMsgType::Ok);
+				SM_Debug::ShowMessageDialog(FText::FromString( AssetData.AssetName.ToString() + " is not a valid Texture!"), FText::FromString("Error"), EAppMsgType::Ok);
 				return false;
 			}
+		}
+		else
+		{
+			SM_Debug::ShowMessageDialog(FText::FromString("Selected Asset: " + AssetData.AssetName.ToString() + " is not a Texture!"), FText::FromString("Error"), EAppMsgType::Ok);
+			return false;
+		
 		}
 	}
 
 	return true;
 
+}
+
+bool UQuickMaterialCreationWidget::CheckIfNameIsValid(const FString& Name, const FString& FolderPath) const
+{
+	// 检查当前目录下是否有同名的材质
+	TArray<FString> ExistingAssetsPaths = UEditorAssetLibrary::ListAssets(FolderPath, false);
+
+	for (const FString& AssetPath : ExistingAssetsPaths)
+	{
+		const FString ExistingAssetName = FPaths::GetBaseFilename(AssetPath);
+
+		if (ExistingAssetName == Name)
+		{
+			SM_Debug::ShowMessageDialog(FText::FromString("Material Name: \" " + Name + " \" is already exist!"), FText::FromString("Error"), EAppMsgType::Ok);
+			return false;
+		}
+	}
+
+	return true;
 }
 
 #pragma endregion

@@ -34,6 +34,9 @@ private:
 	// 处理选中的数据
 	bool ProcessSelectedData(const TArray<FAssetData>& SelectedAssetsData, TArray<UTexture2D*>& OutSelectedTexturesArray, FString& OutSelectedTexturePath);
 
+	// 检查名称是否有效
+	bool CheckIfNameIsValid(const FString& Name, const FString& FolderPath) const;
+
 #pragma endregion
 
 };
