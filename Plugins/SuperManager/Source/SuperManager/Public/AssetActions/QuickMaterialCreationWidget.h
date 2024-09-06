@@ -27,6 +27,75 @@ public:
 
 #pragma endregion
 
+#pragma region SupportedTextureFormats
+	// 基础颜色
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
+	TArray<FString> BaseColorArray = {
+		"_BaseColor",
+		"_Albedo",
+		"_Diffuse",
+		"_Color",
+		"_Diff"
+	};
+
+	// 法线
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
+	TArray<FString> NormalArray = {
+		"_Normal",
+		"_Normals",
+		"_Nrm",
+		"_N",
+		"_NrmMap",
+		"_NormalMap"
+	};
+
+	// 粗糙度
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
+	TArray<FString> RoughnessArray = {
+		"_Roughness",
+		"_Rough",
+		"_RoughnessMap",
+		"_RoughMap"
+	};
+
+	// 金属度
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
+	TArray<FString> MetallicArray = {
+		"_Metallic",
+		"_Metal",
+		"_MetallicMap",
+		"_MetalMap"
+	};
+
+	// 环境光遮蔽
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
+	TArray<FString> AmbientOcclusionArray = {
+		"_AO",
+		"_AmbientOcclusion",
+		"_Occlusion",
+		"_AOMap",
+		"_AmbientOcclusionMap"
+	};
+
+	// 高光
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
+	TArray<FString> SpecularArray = {
+		"_Specular",
+		"_Spec",
+		"_SpecularMap",
+		"_SpecMap"
+	};
+
+	// 切线
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
+	TArray<FString> TangentArray = {
+		"_Tangent",
+		"_TangentMap",
+		"_TangentSpaceNormal"
+	};
+
+#pragma endregion
+
 
 private:
 #pragma region QuickMaterialCreation
