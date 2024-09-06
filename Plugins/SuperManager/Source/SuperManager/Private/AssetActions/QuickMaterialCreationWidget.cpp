@@ -8,7 +8,14 @@
 
 void UQuickMaterialCreationWidget::CreateMaterialFromSelectedTextures()
 {
-	SM_Debug::PrintDebug("CreateMaterialFromSelectedTextures", FColor::Green);
+	if (bUserSetMaterialName)
+	{
+		if (MaterialName.IsEmpty())
+		{
+			SM_Debug::ShowMessageDialog(FText::FromString("Material Name is Empty!"), FText::FromString("Error"), EAppMsgType::Ok);
+			return;
+		}
+	}
 }
 
 #pragma endregion
