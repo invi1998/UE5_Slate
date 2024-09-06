@@ -38,26 +38,6 @@ public:
 		"_Diff"
 	};
 
-	// 法线
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
-	TArray<FString> NormalArray = {
-		"_Normal",
-		"_Normals",
-		"_Nrm",
-		"_N",
-		"_NrmMap",
-		"_NormalMap"
-	};
-
-	// 粗糙度
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
-	TArray<FString> RoughnessArray = {
-		"_Roughness",
-		"_Rough",
-		"_RoughnessMap",
-		"_RoughMap"
-	};
-
 	// 金属度
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
 	TArray<FString> MetallicArray = {
@@ -65,16 +45,6 @@ public:
 		"_Metal",
 		"_MetallicMap",
 		"_MetalMap"
-	};
-
-	// 环境光遮蔽
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
-	TArray<FString> AmbientOcclusionArray = {
-		"_AO",
-		"_AmbientOcclusion",
-		"_Occlusion",
-		"_AOMap",
-		"_AmbientOcclusionMap"
 	};
 
 	// 高光
@@ -86,12 +56,60 @@ public:
 		"_SpecMap"
 	};
 
+	// 粗糙度
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
+	TArray<FString> RoughnessArray = {
+		"_Roughness",
+		"_Rough",
+		"_RoughnessMap",
+		"_RoughMap"
+	};
+
+	// 各项异性
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
+	TArray<FString> AnisotropyArray = {
+		"_Anisotropy",
+		"_Aniso",
+		"_AnisotropyMap",
+		"_AnisoMap"
+	};
+
+	// 自发光
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
+	TArray<FString> EmissiveArray = {
+		"_Emissive",
+		"_Emission",
+		"_EmissiveMap",
+		"_EmissionMap"
+	};
+
+	// 法线
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
+	TArray<FString> NormalArray = {
+		"_Normal",
+		"_Normals",
+		"_Nrm",
+		"_N",
+		"_NrmMap",
+		"_NormalMap"
+	};
+
 	// 切线
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
 	TArray<FString> TangentArray = {
 		"_Tangent",
 		"_TangentMap",
 		"_TangentSpaceNormal"
+	};
+
+	// 环境光遮蔽
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
+	TArray<FString> AmbientOcclusionArray = {
+		"_AO",
+		"_AmbientOcclusion",
+		"_Occlusion",
+		"_AOMap",
+		"_AmbientOcclusionMap"
 	};
 
 #pragma endregion
@@ -116,10 +134,26 @@ private:
 
 #pragma region CreateMaterialNode
 
-	// 检查是否是支持的纹理格式
+	// 连接基础颜色
 	bool TryConnectBaseColor(class UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const;
 
+	// 连接金属度
 	bool TryConnectMetallic(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const;
+
+	// 连接高光
+	bool TryConnectSpecular(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const;
+
+	// 连接粗糙度
+	bool TryConnectRoughness(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const;
+
+	// 连接各向异性
+	bool TryConnectAnisotropy(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const;
+
+	// 连接法线
+	bool TryConnectNormal(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const;
+
+	// 连接环境光遮蔽（AO)
+	bool TryConnectAmbientOcclusion(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const;
 
 #pragma endregion
 

@@ -189,6 +189,56 @@ void UQuickMaterialCreationWidget::Default_CreateMaterialNode(UMaterial* Materia
 			}
 		}
 
+		if (!Material->GetMaterial()->HasSpecularConnected())
+		{
+			// 高光
+			if (TryConnectSpecular(TextureSample, Texture, Material))
+			{
+				ConnectedPinsNum++;
+				return;
+			}
+		}
+
+		if (!Material->GetMaterial()->HasRoughnessConnected())
+		{
+			// 粗糙度
+			if (TryConnectRoughness(TextureSample, Texture, Material))
+			{
+				ConnectedPinsNum++;
+				return;
+			}
+		}
+
+		if (!Material->GetMaterial()->HasAnisotropyConnected())
+		{
+			// 各向异性
+			if (TryConnectAnisotropy(TextureSample, Texture, Material))
+			{
+				ConnectedPinsNum++;
+				return;
+			}
+		}
+
+		if (!Material->GetMaterial()->HasNormalConnected())
+		{
+			// 法线
+			if (TryConnectNormal(TextureSample, Texture, Material))
+			{
+				ConnectedPinsNum++;
+				return;
+			}
+		}
+
+		if (!Material->GetMaterial()->HasAmbientOcclusionConnected())
+		{
+			// 环境光遮蔽
+			if (TryConnectAmbientOcclusion(TextureSample, Texture, Material))
+			{
+				ConnectedPinsNum++;
+				return;
+			}
+		}
+
 	}
 }
 
@@ -240,6 +290,153 @@ bool UQuickMaterialCreationWidget::TryConnectMetallic(UMaterialExpressionTexture
 		}
 	}
 
+	return false;
+}
+
+bool UQuickMaterialCreationWidget::TryConnectSpecular(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const
+{
+	for (const FString& Specular : SpecularArray)
+	{
+		if (Texture->GetName().Contains(Specular))
+		{
+			// 设置纹理参数
+			Texture->CompressionSettings = TextureCompressionSettings::TC_Default;		// 设置纹理压缩格式（默认，Default (DXT1/5, BC1/3 on DX11)不压缩）
+			Texture->SRGB = false;														// 设置是否使用sRGB
+			Texture->PostEditChange();
+
+			// 指定纹理
+			TextureSample->Texture = Texture;
+			TextureSample->SamplerType = SAMPLERTYPE_LinearColor;
+
+			// 添加到材质表达式集合
+			Material->GetExpressionCollection().AddExpression(TextureSample);
+			Material->GetExpressionInputForProperty(MP_Specular)->Connect(0, TextureSample);
+			Material->PostEditChange();
+
+			TextureSample->MaterialExpressionEditorX -= 1000;
+			TextureSample->MaterialExpressionEditorY += 60;
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool UQuickMaterialCreationWidget::TryConnectRoughness(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const
+{
+	for (const FString& Roughness : RoughnessArray)
+	{
+		if (Texture->GetName().Contains(Roughness))
+		{
+			// 设置纹理参数
+			Texture->CompressionSettings = TextureCompressionSettings::TC_Default;		// 设置纹理压缩格式（默认，Default (DXT1/5, BC1/3 on DX11)不压缩）
+			Texture->SRGB = false;														// 设置是否使用sRGB
+			Texture->PostEditChange();
+
+			// 指定纹理
+			TextureSample->Texture = Texture;
+			TextureSample->SamplerType = SAMPLERTYPE_LinearColor;
+
+			// 添加到材质表达式集合
+			Material->GetExpressionCollection().AddExpression(TextureSample);
+			Material->GetExpressionInputForProperty(MP_Roughness)->Connect(0, TextureSample);
+			Material->PostEditChange();
+
+			TextureSample->MaterialExpressionEditorX -= 1300;
+			TextureSample->MaterialExpressionEditorY += 90;
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool UQuickMaterialCreationWidget::TryConnectAnisotropy(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const
+{
+	for (const FString& Anisotropy : AnisotropyArray)
+	{
+		if (Texture->GetName().Contains(Anisotropy))
+		{
+			// 设置纹理参数
+			Texture->CompressionSettings = TextureCompressionSettings::TC_Default;		// 设置纹理压缩格式（默认，Default (DXT1/5, BC1/3 on DX11)不压缩）
+			Texture->SRGB = false;														// 设置是否使用sRGB
+			Texture->PostEditChange();
+
+			// 指定纹理
+			TextureSample->Texture = Texture;
+			TextureSample->SamplerType = SAMPLERTYPE_LinearColor;
+
+			// 添加到材质表达式集合
+			Material->GetExpressionCollection().AddExpression(TextureSample);
+			Material->GetExpressionInputForProperty(MP_Anisotropy)->Connect(0, TextureSample);
+			Material->PostEditChange();
+
+			TextureSample->MaterialExpressionEditorX -= 1600;
+			TextureSample->MaterialExpressionEditorY += 120;
+
+			return true;
+		}
+	}
+	return false;
+}
+
+bool UQuickMaterialCreationWidget::TryConnectNormal(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const
+{
+	for (const FString& Normal : NormalArray)
+	{
+		if (Texture->GetName().Contains(Normal))
+		{
+			// 设置纹理参数
+			Texture->CompressionSettings = TextureCompressionSettings::TC_Normalmap;		// 设置纹理压缩格式（法线贴图，Normalmap）
+			Texture->SRGB = false;														// 设置是否使用sRGB
+			Texture->PostEditChange();
+
+			// 指定纹理
+			TextureSample->Texture = Texture;
+			TextureSample->SamplerType = SAMPLERTYPE_Normal;
+
+			// 添加到材质表达式集合
+			Material->GetExpressionCollection().AddExpression(TextureSample);
+			Material->GetExpressionInputForProperty(MP_Normal)->Connect(0, TextureSample);
+			Material->PostEditChange();
+
+			TextureSample->MaterialExpressionEditorX -= 1900;
+			TextureSample->MaterialExpressionEditorY += 30 * 9;
+
+			return true;
+		}
+	}
+	return false;
+}
+
+bool UQuickMaterialCreationWidget::TryConnectAmbientOcclusion(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const
+{
+	for (const FString& AmbientOcclusion : AmbientOcclusionArray)
+	{
+		if (Texture->GetName().Contains(AmbientOcclusion))
+		{
+			// 设置纹理参数
+			Texture->CompressionSettings = TextureCompressionSettings::TC_Default;		// 设置纹理压缩格式（默认，Default (DXT1/5, BC1/3 on DX11)不压缩）
+			Texture->SRGB = false;														// 设置是否使用sRGB
+			Texture->PostEditChange();
+
+			// 指定纹理
+			TextureSample->Texture = Texture;
+			TextureSample->SamplerType = SAMPLERTYPE_LinearColor;
+
+			// 添加到材质表达式集合
+			Material->GetExpressionCollection().AddExpression(TextureSample);
+			Material->GetExpressionInputForProperty(MP_AmbientOcclusion)->Connect(0, TextureSample);
+			Material->PostEditChange();
+
+			TextureSample->MaterialExpressionEditorX -= 2500;
+			TextureSample->MaterialExpressionEditorY += 30 * 15;
+
+			return true;
+		}
+	}
 	return false;
 }
 
