@@ -37,6 +37,9 @@ private:
 	// 检查名称是否有效
 	bool CheckIfNameIsValid(const FString& Name, const FString& FolderPath) const;
 
+	// 创建材质
+	UMaterial* CreateMaterial(const TArray<UTexture2D*>& TexturesArray, const FString& FolderPath) const;
+
 #pragma endregion
 
 };
