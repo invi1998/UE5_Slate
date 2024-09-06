@@ -165,14 +165,30 @@ UMaterial* UQuickMaterialCreationWidget::CreateMaterial( const TArray<UTexture2D
 
 void UQuickMaterialCreationWidget::Default_CreateMaterialNode(UMaterial* Material, UTexture2D* Texture, uint32& ConnectedPinsNum) const
 {
-	UMaterialExpressionTextureSample* TextureSample = NewObject<UMaterialExpressionTextureSample>(Material);
-
-	if (TextureSample)
+	if (UMaterialExpressionTextureSample* TextureSample = NewObject<UMaterialExpressionTextureSample>(Material))
 	{
-		if (TryConnectBaseColor(TextureSample, Texture, Material))
+		// 如果材质的基础色节点未连接
+		if (!Material->GetMaterial()->HasBaseColorConnected())
 		{
-			ConnectedPinsNum++;
+			// 基础颜色
+			if (TryConnectBaseColor(TextureSample, Texture, Material))
+			{
+				ConnectedPinsNum++;
+				return;
+			}
 		}
+
+		// 如果材质的金属度节点未连接
+		if (!Material->GetMaterial()->HasMetallicConnected())
+		{
+			// 金属度
+			if (TryConnectMetallic(TextureSample, Texture, Material))
+			{
+				ConnectedPinsNum++;
+				return;
+			}
+		}
+
 	}
 }
 
@@ -188,7 +204,37 @@ bool UQuickMaterialCreationWidget::TryConnectBaseColor(UMaterialExpressionTextur
 			Material->GetExpressionInputForProperty(MP_BaseColor)->Connect(0, TextureSample);
 			Material->PostEditChange();
 
-			TextureSample->MaterialExpressionEditorX -= 600;
+			TextureSample->MaterialExpressionEditorX -= 400;
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool UQuickMaterialCreationWidget::TryConnectMetallic(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const
+{
+	for (const FString& Metallic : MetallicArray)
+	{
+		if (Texture->GetName().Contains(Metallic))
+		{
+			// 设置纹理参数
+			Texture->CompressionSettings = TextureCompressionSettings::TC_Default;		// 设置纹理压缩格式（默认，Default (DXT1/5, BC1/3 on DX11)不压缩）
+			Texture->SRGB = false;														// 设置是否使用sRGB
+			Texture->PostEditChange();
+
+			// 指定纹理
+			TextureSample->Texture = Texture;
+			TextureSample->SamplerType = SAMPLERTYPE_LinearColor;
+			
+			// 添加到材质表达式集合
+			Material->GetExpressionCollection().AddExpression(TextureSample);
+			Material->GetExpressionInputForProperty(MP_Metallic)->Connect(0, TextureSample);
+			Material->PostEditChange();
+
+			TextureSample->MaterialExpressionEditorX -= 700;
+			TextureSample->MaterialExpressionEditorY += 30;
 
 			return true;
 		}

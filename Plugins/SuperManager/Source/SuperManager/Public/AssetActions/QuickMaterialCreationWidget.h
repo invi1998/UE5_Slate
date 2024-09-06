@@ -109,6 +109,7 @@ private:
 	// 创建材质
 	UMaterial* CreateMaterial(const TArray<UTexture2D*>& TexturesArray, const FString& FolderPath) const;
 
+	
 	void Default_CreateMaterialNode(UMaterial* Material, UTexture2D* Texture, uint32& ConnectedPinsNum) const;
 
 #pragma endregion
@@ -117,6 +118,8 @@ private:
 
 	// 检查是否是支持的纹理格式
 	bool TryConnectBaseColor(class UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const;
+
+	bool TryConnectMetallic(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const;
 
 #pragma endregion
 
