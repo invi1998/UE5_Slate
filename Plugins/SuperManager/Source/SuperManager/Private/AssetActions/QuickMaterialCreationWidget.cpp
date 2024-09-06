@@ -56,8 +56,23 @@ void UQuickMaterialCreationWidget::CreateMaterialFromSelectedTextures()
 				continue;
 			}
 
-			Default_CreateMaterialNode(NewMaterial, Texture, ConnectedPinsNum, XOffset);
+			switch (ChannelPackingType)
+			{
+			case E_ChannelPackingType::ECPT_NoChannelPacking:
+				{
+					Default_CreateMaterialNode(NewMaterial, Texture, ConnectedPinsNum, XOffset);
+					break;
+				};
+			case E_ChannelPackingType::ECPT_ORM:
+				{
+					ORM_CreateMaterialNode(NewMaterial, Texture, ConnectedPinsNum, XOffset);
+					break;
+				};
+			case E_ChannelPackingType::ECPT_MAX: break;
+			default: break;
+			}
 		}
+
 	}
 
 	MaterialName.Empty();
@@ -248,6 +263,58 @@ void UQuickMaterialCreationWidget::Default_CreateMaterialNode(UMaterial* Materia
 			}
 		}
 
+	}
+}
+
+void UQuickMaterialCreationWidget::ORM_CreateMaterialNode(UMaterial* Material, UTexture2D* Texture, uint32& ConnectedPinsNum, float& OffsetX) const
+{
+	if (UMaterialExpressionTextureSample* TextureSample = NewObject<UMaterialExpressionTextureSample>(Material))
+	{
+		// 如果材质的基础色节点未连接
+		if (!Material->GetMaterial()->HasBaseColorConnected())
+		{
+			// 基础颜色
+			if (TryConnectBaseColor(TextureSample, Texture, Material, OffsetX))
+			{
+				ConnectedPinsNum++;
+				OffsetX += 300;
+				return;
+			}
+		}
+
+		// 如果材质的金属度节点，粗糙度节点，环境光遮蔽节点未连接
+		if (!Material->GetMaterial()->HasMetallicConnected() || !Material->GetMaterial()->HasRoughnessConnected() || !Material->GetMaterial()->HasAmbientOcclusionConnected())
+		{
+			// ORM
+			if (TryConnectORM(TextureSample, Texture, Material, OffsetX))
+			{
+				ConnectedPinsNum++;
+				OffsetX += 300;
+				return;
+			}
+		}
+
+		if (!Material->GetMaterial()->HasNormalConnected())
+		{
+			// 法线
+			if (TryConnectNormal(TextureSample, Texture, Material, OffsetX))
+			{
+				ConnectedPinsNum++;
+				OffsetX += 300;
+				return;
+			}
+		}
+
+		if (!Material->GetMaterial()->HasAnisotropyConnected())
+		{
+			// 各向异性
+			if (TryConnectAnisotropy(TextureSample, Texture, Material, OffsetX))
+			{
+				ConnectedPinsNum++;
+				OffsetX += 300;
+				return;
+			}
+		}
 	}
 }
 
@@ -442,6 +509,37 @@ bool UQuickMaterialCreationWidget::TryConnectAmbientOcclusion(UMaterialExpressio
 
 			TextureSample->MaterialExpressionEditorX -= OffsetX;
 			TextureSample->MaterialExpressionEditorY += 30 * 14;
+
+			return true;
+		}
+	}
+	return false;
+}
+
+bool UQuickMaterialCreationWidget::TryConnectORM(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material, float OffsetX) const
+{
+	for (const FString& ORM : ORMArray)
+	{
+		if (Texture->GetName().Contains(ORM))
+		{
+			// 设置纹理参数
+			Texture->CompressionSettings = TextureCompressionSettings::TC_Masks;		// 设置纹理压缩格式（掩码，Masks）
+			Texture->SRGB = false;														// 设置是否使用sRGB
+			Texture->PostEditChange();
+
+			// 指定纹理
+			TextureSample->Texture = Texture;
+			TextureSample->SamplerType = SAMPLERTYPE_Masks;			// 设置采样类型(掩码)
+
+			// 添加到材质表达式集合
+			Material->GetExpressionCollection().AddExpression(TextureSample);
+			Material->GetExpressionInputForProperty(MP_AmbientOcclusion)->Connect(1, TextureSample);		// AO
+			Material->GetExpressionInputForProperty(MP_Roughness)->Connect(2, TextureSample);			// Roughness
+			Material->GetExpressionInputForProperty(MP_Metallic)->Connect(3, TextureSample);				// Metallic
+			Material->PostEditChange();
+
+			TextureSample->MaterialExpressionEditorX -= OffsetX;
+			TextureSample->MaterialExpressionEditorY += 30;
 
 			return true;
 		}

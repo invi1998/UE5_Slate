@@ -6,6 +6,15 @@
 #include "EditorUtilityWidget.h"
 #include "QuickMaterialCreationWidget.generated.h"
 
+// 是否使用通道打包（ORM）
+UENUM(BlueprintType)
+enum class E_ChannelPackingType : uint8
+{
+	ECPT_NoChannelPacking		UMETA(DisplayName = "No Channel Packing"),
+	ECPT_ORM					UMETA(DisplayName = "OcclusionRoughnessMetallic"),
+	ECPT_MAX					UMETA(Hidden)
+};
+
 /**
  * 
  */
@@ -18,6 +27,9 @@ public:
 #pragma region QuickMaterialCreationCore
 	UFUNCTION(BlueprintCallable, Category = "QuickMaterialCreationCore")
 	void CreateMaterialFromSelectedTextures();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CreateMaterialFromSelectedTextures")
+	E_ChannelPackingType ChannelPackingType = E_ChannelPackingType::ECPT_NoChannelPacking;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CreateMaterialFromSelectedTextures", meta = (EditCondition = "bUserSetMaterialName"))
 	FString MaterialName;
@@ -112,6 +124,17 @@ public:
 		"_AmbientOcclusionMap"
 	};
 
+	// 通道(ORM，纹理的RGB分别存储Occlusion、Roughness、Metallic)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SupportedTextureFormats")
+	TArray<FString> ORMArray = {
+		"_ORM",
+		"_ORMMap",
+		"_ORMMap",
+		"_ORMMap",
+		"_arm",
+		"_OcclusionRoughnessMetallic"
+	};
+
 #pragma endregion
 
 
@@ -129,6 +152,8 @@ private:
 
 	
 	void Default_CreateMaterialNode(UMaterial* Material, UTexture2D* Texture, uint32& ConnectedPinsNum, float& OffsetX) const;
+
+	void ORM_CreateMaterialNode(UMaterial* Material, UTexture2D* Texture, uint32& ConnectedPinsNum, float& OffsetX) const;
 
 #pragma endregion
 
@@ -154,6 +179,8 @@ private:
 
 	// 连接环境光遮蔽（AO)
 	bool TryConnectAmbientOcclusion(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material, float OffsetX) const;
+
+	bool TryConnectORM(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material, float OffsetX) const;
 
 #pragma endregion
 
