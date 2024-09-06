@@ -60,7 +60,7 @@ void UQuickMaterialCreationWidget::CreateMaterialFromSelectedTextures()
 		}
 	}
 
-
+	MaterialName.Empty();
 }
 
 
