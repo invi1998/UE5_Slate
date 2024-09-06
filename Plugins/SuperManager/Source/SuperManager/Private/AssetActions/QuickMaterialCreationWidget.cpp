@@ -7,6 +7,7 @@
 #include "EditorUtilityLibrary.h"
 #include "AssetToolsModule.h"
 #include "Factories/MaterialFactoryNew.h"
+#include "Materials/MaterialExpressionTextureSample.h"
 
 #pragma region QuickMaterialCreationCore
 
@@ -45,11 +46,17 @@ void UQuickMaterialCreationWidget::CreateMaterialFromSelectedTextures()
 
 	if (UMaterial* NewMaterial = CreateMaterial(SelectedTexturesArray, SelectedTextureFolderPath))
 	{
-		SM_Debug::ShowMessageDialog(FText::FromString("Material: " + MaterialName + " Created Successfully!"), FText::FromString("Success"), EAppMsgType::Ok);
-	}
-	else
-	{
-		SM_Debug::ShowMessageDialog(FText::FromString("Failed to Create Material: " + MaterialName), FText::FromString("Error"), EAppMsgType::Ok);
+		uint32 ConnectedPinsNum = 0;
+		// 遍历纹理，给材质设置参数
+		for (UTexture2D* Texture : SelectedTexturesArray)
+		{
+			if (!Texture)
+			{
+				continue;
+			}
+
+			Default_CreateMaterialNode(NewMaterial, Texture, ConnectedPinsNum);
+		}
 	}
 
 
@@ -154,6 +161,40 @@ UMaterial* UQuickMaterialCreationWidget::CreateMaterial( const TArray<UTexture2D
 	}
 
 	return NewMaterial;
+}
+
+void UQuickMaterialCreationWidget::Default_CreateMaterialNode(UMaterial* Material, UTexture2D* Texture, uint32& ConnectedPinsNum) const
+{
+	UMaterialExpressionTextureSample* TextureSample = NewObject<UMaterialExpressionTextureSample>(Material);
+
+	if (TextureSample)
+	{
+		if (TryConnectBaseColor(TextureSample, Texture, Material))
+		{
+			ConnectedPinsNum++;
+		}
+	}
+}
+
+bool UQuickMaterialCreationWidget::TryConnectBaseColor(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const
+{
+	for (const FString& BaseColor : BaseColorArray)
+	{
+		if (Texture->GetName().Contains(BaseColor))
+		{
+			TextureSample->Texture = Texture;
+
+			Material->GetExpressionCollection().AddExpression(TextureSample);
+			Material->GetExpressionInputForProperty(MP_BaseColor)->Connect(0, TextureSample);
+			Material->PostEditChange();
+
+			TextureSample->MaterialExpressionEditorX -= 600;
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 #pragma endregion
