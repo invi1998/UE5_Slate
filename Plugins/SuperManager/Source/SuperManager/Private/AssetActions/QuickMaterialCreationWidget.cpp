@@ -47,6 +47,7 @@ void UQuickMaterialCreationWidget::CreateMaterialFromSelectedTextures()
 	if (UMaterial* NewMaterial = CreateMaterial(SelectedTexturesArray, SelectedTextureFolderPath))
 	{
 		uint32 ConnectedPinsNum = 0;
+		float XOffset = 300;
 		// 遍历纹理，给材质设置参数
 		for (UTexture2D* Texture : SelectedTexturesArray)
 		{
@@ -55,7 +56,7 @@ void UQuickMaterialCreationWidget::CreateMaterialFromSelectedTextures()
 				continue;
 			}
 
-			Default_CreateMaterialNode(NewMaterial, Texture, ConnectedPinsNum);
+			Default_CreateMaterialNode(NewMaterial, Texture, ConnectedPinsNum, XOffset);
 		}
 	}
 
@@ -163,17 +164,19 @@ UMaterial* UQuickMaterialCreationWidget::CreateMaterial( const TArray<UTexture2D
 	return NewMaterial;
 }
 
-void UQuickMaterialCreationWidget::Default_CreateMaterialNode(UMaterial* Material, UTexture2D* Texture, uint32& ConnectedPinsNum) const
+void UQuickMaterialCreationWidget::Default_CreateMaterialNode(UMaterial* Material, UTexture2D* Texture, uint32& ConnectedPinsNum, float& OffsetX) const
 {
 	if (UMaterialExpressionTextureSample* TextureSample = NewObject<UMaterialExpressionTextureSample>(Material))
 	{
+		
 		// 如果材质的基础色节点未连接
 		if (!Material->GetMaterial()->HasBaseColorConnected())
 		{
 			// 基础颜色
-			if (TryConnectBaseColor(TextureSample, Texture, Material))
+			if (TryConnectBaseColor(TextureSample, Texture, Material, OffsetX))
 			{
 				ConnectedPinsNum++;
+				OffsetX+= 300;
 				return;
 			}
 		}
@@ -182,9 +185,10 @@ void UQuickMaterialCreationWidget::Default_CreateMaterialNode(UMaterial* Materia
 		if (!Material->GetMaterial()->HasMetallicConnected())
 		{
 			// 金属度
-			if (TryConnectMetallic(TextureSample, Texture, Material))
+			if (TryConnectMetallic(TextureSample, Texture, Material, OffsetX))
 			{
 				ConnectedPinsNum++;
+				OffsetX += 300;
 				return;
 			}
 		}
@@ -192,9 +196,10 @@ void UQuickMaterialCreationWidget::Default_CreateMaterialNode(UMaterial* Materia
 		if (!Material->GetMaterial()->HasSpecularConnected())
 		{
 			// 高光
-			if (TryConnectSpecular(TextureSample, Texture, Material))
+			if (TryConnectSpecular(TextureSample, Texture, Material, OffsetX))
 			{
 				ConnectedPinsNum++;
+				OffsetX += 300;
 				return;
 			}
 		}
@@ -202,9 +207,10 @@ void UQuickMaterialCreationWidget::Default_CreateMaterialNode(UMaterial* Materia
 		if (!Material->GetMaterial()->HasRoughnessConnected())
 		{
 			// 粗糙度
-			if (TryConnectRoughness(TextureSample, Texture, Material))
+			if (TryConnectRoughness(TextureSample, Texture, Material, OffsetX))
 			{
 				ConnectedPinsNum++;
+				OffsetX += 300;
 				return;
 			}
 		}
@@ -212,9 +218,10 @@ void UQuickMaterialCreationWidget::Default_CreateMaterialNode(UMaterial* Materia
 		if (!Material->GetMaterial()->HasAnisotropyConnected())
 		{
 			// 各向异性
-			if (TryConnectAnisotropy(TextureSample, Texture, Material))
+			if (TryConnectAnisotropy(TextureSample, Texture, Material, OffsetX))
 			{
 				ConnectedPinsNum++;
+				OffsetX += 300;
 				return;
 			}
 		}
@@ -222,9 +229,10 @@ void UQuickMaterialCreationWidget::Default_CreateMaterialNode(UMaterial* Materia
 		if (!Material->GetMaterial()->HasNormalConnected())
 		{
 			// 法线
-			if (TryConnectNormal(TextureSample, Texture, Material))
+			if (TryConnectNormal(TextureSample, Texture, Material, OffsetX))
 			{
 				ConnectedPinsNum++;
+				OffsetX += 300;
 				return;
 			}
 		}
@@ -232,9 +240,10 @@ void UQuickMaterialCreationWidget::Default_CreateMaterialNode(UMaterial* Materia
 		if (!Material->GetMaterial()->HasAmbientOcclusionConnected())
 		{
 			// 环境光遮蔽
-			if (TryConnectAmbientOcclusion(TextureSample, Texture, Material))
+			if (TryConnectAmbientOcclusion(TextureSample, Texture, Material, OffsetX))
 			{
 				ConnectedPinsNum++;
+				OffsetX += 300;
 				return;
 			}
 		}
@@ -242,7 +251,7 @@ void UQuickMaterialCreationWidget::Default_CreateMaterialNode(UMaterial* Materia
 	}
 }
 
-bool UQuickMaterialCreationWidget::TryConnectBaseColor(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const
+bool UQuickMaterialCreationWidget::TryConnectBaseColor(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material, float OffsetX) const
 {
 	for (const FString& BaseColor : BaseColorArray)
 	{
@@ -254,7 +263,7 @@ bool UQuickMaterialCreationWidget::TryConnectBaseColor(UMaterialExpressionTextur
 			Material->GetExpressionInputForProperty(MP_BaseColor)->Connect(0, TextureSample);
 			Material->PostEditChange();
 
-			TextureSample->MaterialExpressionEditorX -= 400;
+			TextureSample->MaterialExpressionEditorX -= OffsetX;
 
 			return true;
 		}
@@ -263,7 +272,7 @@ bool UQuickMaterialCreationWidget::TryConnectBaseColor(UMaterialExpressionTextur
 	return false;
 }
 
-bool UQuickMaterialCreationWidget::TryConnectMetallic(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const
+bool UQuickMaterialCreationWidget::TryConnectMetallic(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material, float OffsetX) const
 {
 	for (const FString& Metallic : MetallicArray)
 	{
@@ -283,7 +292,7 @@ bool UQuickMaterialCreationWidget::TryConnectMetallic(UMaterialExpressionTexture
 			Material->GetExpressionInputForProperty(MP_Metallic)->Connect(0, TextureSample);
 			Material->PostEditChange();
 
-			TextureSample->MaterialExpressionEditorX -= 700;
+			TextureSample->MaterialExpressionEditorX -= OffsetX;
 			TextureSample->MaterialExpressionEditorY += 30;
 
 			return true;
@@ -293,7 +302,7 @@ bool UQuickMaterialCreationWidget::TryConnectMetallic(UMaterialExpressionTexture
 	return false;
 }
 
-bool UQuickMaterialCreationWidget::TryConnectSpecular(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const
+bool UQuickMaterialCreationWidget::TryConnectSpecular(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material, float OffsetX) const
 {
 	for (const FString& Specular : SpecularArray)
 	{
@@ -313,8 +322,8 @@ bool UQuickMaterialCreationWidget::TryConnectSpecular(UMaterialExpressionTexture
 			Material->GetExpressionInputForProperty(MP_Specular)->Connect(0, TextureSample);
 			Material->PostEditChange();
 
-			TextureSample->MaterialExpressionEditorX -= 1000;
-			TextureSample->MaterialExpressionEditorY += 60;
+			TextureSample->MaterialExpressionEditorX -= OffsetX;
+			TextureSample->MaterialExpressionEditorY += 30 * 2;
 
 			return true;
 		}
@@ -323,7 +332,7 @@ bool UQuickMaterialCreationWidget::TryConnectSpecular(UMaterialExpressionTexture
 	return false;
 }
 
-bool UQuickMaterialCreationWidget::TryConnectRoughness(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const
+bool UQuickMaterialCreationWidget::TryConnectRoughness(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material, float OffsetX) const
 {
 	for (const FString& Roughness : RoughnessArray)
 	{
@@ -343,8 +352,8 @@ bool UQuickMaterialCreationWidget::TryConnectRoughness(UMaterialExpressionTextur
 			Material->GetExpressionInputForProperty(MP_Roughness)->Connect(0, TextureSample);
 			Material->PostEditChange();
 
-			TextureSample->MaterialExpressionEditorX -= 1300;
-			TextureSample->MaterialExpressionEditorY += 90;
+			TextureSample->MaterialExpressionEditorX -= OffsetX;
+			TextureSample->MaterialExpressionEditorY += 30 * 3;
 
 			return true;
 		}
@@ -353,7 +362,7 @@ bool UQuickMaterialCreationWidget::TryConnectRoughness(UMaterialExpressionTextur
 	return false;
 }
 
-bool UQuickMaterialCreationWidget::TryConnectAnisotropy(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const
+bool UQuickMaterialCreationWidget::TryConnectAnisotropy(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material, float OffsetX) const
 {
 	for (const FString& Anisotropy : AnisotropyArray)
 	{
@@ -373,8 +382,8 @@ bool UQuickMaterialCreationWidget::TryConnectAnisotropy(UMaterialExpressionTextu
 			Material->GetExpressionInputForProperty(MP_Anisotropy)->Connect(0, TextureSample);
 			Material->PostEditChange();
 
-			TextureSample->MaterialExpressionEditorX -= 1600;
-			TextureSample->MaterialExpressionEditorY += 120;
+			TextureSample->MaterialExpressionEditorX -= OffsetX;
+			TextureSample->MaterialExpressionEditorY += 30 * 4;
 
 			return true;
 		}
@@ -382,7 +391,7 @@ bool UQuickMaterialCreationWidget::TryConnectAnisotropy(UMaterialExpressionTextu
 	return false;
 }
 
-bool UQuickMaterialCreationWidget::TryConnectNormal(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const
+bool UQuickMaterialCreationWidget::TryConnectNormal(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material, float OffsetX) const
 {
 	for (const FString& Normal : NormalArray)
 	{
@@ -402,8 +411,8 @@ bool UQuickMaterialCreationWidget::TryConnectNormal(UMaterialExpressionTextureSa
 			Material->GetExpressionInputForProperty(MP_Normal)->Connect(0, TextureSample);
 			Material->PostEditChange();
 
-			TextureSample->MaterialExpressionEditorX -= 1900;
-			TextureSample->MaterialExpressionEditorY += 30 * 9;
+			TextureSample->MaterialExpressionEditorX -= OffsetX;
+			TextureSample->MaterialExpressionEditorY += 30 * 8;
 
 			return true;
 		}
@@ -411,7 +420,7 @@ bool UQuickMaterialCreationWidget::TryConnectNormal(UMaterialExpressionTextureSa
 	return false;
 }
 
-bool UQuickMaterialCreationWidget::TryConnectAmbientOcclusion(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material) const
+bool UQuickMaterialCreationWidget::TryConnectAmbientOcclusion(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material, float OffsetX) const
 {
 	for (const FString& AmbientOcclusion : AmbientOcclusionArray)
 	{
@@ -431,8 +440,8 @@ bool UQuickMaterialCreationWidget::TryConnectAmbientOcclusion(UMaterialExpressio
 			Material->GetExpressionInputForProperty(MP_AmbientOcclusion)->Connect(0, TextureSample);
 			Material->PostEditChange();
 
-			TextureSample->MaterialExpressionEditorX -= 2500;
-			TextureSample->MaterialExpressionEditorY += 30 * 15;
+			TextureSample->MaterialExpressionEditorX -= OffsetX;
+			TextureSample->MaterialExpressionEditorY += 30 * 14;
 
 			return true;
 		}
