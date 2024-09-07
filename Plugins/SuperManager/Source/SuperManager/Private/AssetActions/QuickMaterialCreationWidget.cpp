@@ -79,7 +79,7 @@ void UQuickMaterialCreationWidget::CreateMaterialFromSelectedTextures()
 		{
 			if (UMaterialInstanceConstant* NewMaterialInstance = CreateMaterialInstance(NewMaterial, SelectedTextureFolderPath))
 			{
-				NewMaterialInstance->SetParentEditorOnly(NewMaterial);
+				NewMaterialInstance->SetParentEditorOnly(NewMaterial);		// 设置父材质
 			}
 		}
 
