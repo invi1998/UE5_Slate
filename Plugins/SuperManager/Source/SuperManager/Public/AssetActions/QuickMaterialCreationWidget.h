@@ -37,6 +37,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CreateMaterialFromSelectedTextures")
 	bool bUserSetMaterialName;		// 如果为true，则使用用户设置的材质名称，否则使用默认的材质名称
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CreateMaterialFromSelectedTextures")
+	bool bCreateMaterialInstance = false;	// 是否创建材质实例
+
 #pragma endregion
 
 #pragma region SupportedTextureFormats
@@ -154,6 +157,8 @@ private:
 	void Default_CreateMaterialNode(UMaterial* Material, UTexture2D* Texture, uint32& ConnectedPinsNum, float& OffsetX) const;
 
 	void ORM_CreateMaterialNode(UMaterial* Material, UTexture2D* Texture, uint32& ConnectedPinsNum, float& OffsetX) const;
+
+	class UMaterialInstanceConstant* CreateMaterialInstance(const UMaterial* ParentMaterial, const FString& FolderPath) const;
 
 #pragma endregion
 

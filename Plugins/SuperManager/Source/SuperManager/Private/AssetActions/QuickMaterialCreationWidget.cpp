@@ -7,7 +7,9 @@
 #include "EditorUtilityLibrary.h"
 #include "AssetToolsModule.h"
 #include "Factories/MaterialFactoryNew.h"
+#include "Factories/MaterialInstanceConstantFactoryNew.h"
 #include "Materials/MaterialExpressionTextureSample.h"
+#include "Materials/MaterialInstanceConstant.h"
 
 #pragma region QuickMaterialCreationCore
 
@@ -70,6 +72,14 @@ void UQuickMaterialCreationWidget::CreateMaterialFromSelectedTextures()
 				};
 			case E_ChannelPackingType::ECPT_MAX: break;
 			default: break;
+			}
+		}
+
+		if (ConnectedPinsNum > 0 && bCreateMaterialInstance)
+		{
+			if (UMaterialInstanceConstant* NewMaterialInstance = CreateMaterialInstance(NewMaterial, SelectedTextureFolderPath))
+			{
+				NewMaterialInstance->SetParentEditorOnly(NewMaterial);
 			}
 		}
 
@@ -316,6 +326,21 @@ void UQuickMaterialCreationWidget::ORM_CreateMaterialNode(UMaterial* Material, U
 			}
 		}
 	}
+}
+
+UMaterialInstanceConstant* UQuickMaterialCreationWidget::CreateMaterialInstance(const UMaterial* ParentMaterial, const FString& FolderPath) const
+{
+	const FAssetToolsModule& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools");
+
+	UMaterialInstanceConstantFactoryNew* MaterialInstanceFactory = NewObject<UMaterialInstanceConstantFactoryNew>();
+
+	FString ParentMaterialName = ParentMaterial->GetName();
+	ParentMaterialName.RemoveFromStart("M_");
+	ParentMaterialName.InsertAt(0, "MI_");
+
+	UObject* NewObject = AssetToolsModule.Get().CreateAsset(ParentMaterialName + "_Instance", FolderPath, UMaterialInstanceConstant::StaticClass(), MaterialInstanceFactory);
+
+	return Cast<UMaterialInstanceConstant>(NewObject);
 }
 
 bool UQuickMaterialCreationWidget::TryConnectBaseColor(UMaterialExpressionTextureSample* TextureSample, UTexture2D* Texture, UMaterial* Material, float OffsetX) const
