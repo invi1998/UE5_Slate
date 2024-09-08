@@ -17,7 +17,7 @@ enum class E_DuplicateAxis : uint8
 };
 
 USTRUCT(BlueprintType)
-struct FRandomActorRotation
+struct FRandomActorTransform
 {
 	GENERATED_BODY()
 
@@ -47,6 +47,43 @@ struct FRandomActorRotation
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomRoll"))
 	float MaxRoll = 180.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bRandomScale = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomScale", ClampMin = "0.0001"))
+	float MinScale = 0.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomScale", ClampMin = "0.0001"))
+	float MaxScale = 1.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bRandomLocationXAixs = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomLocationXAixs"))
+	float MinLocationX = -100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomLocationXAixs"))
+	float MaxLocationX = 100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bRandomLocationYAixs = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomLocationYAixs"))
+	float MinLocationY = -100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomLocationYAixs"))
+	float MaxLocationY = 100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bRandomLocationZAixs = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomLocationZAixs"))
+	float MinLocationZ = -100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomLocationZAixs"))
+	float MaxLocationZ = 100.0f;
+
 };
 
 /**
@@ -78,10 +115,10 @@ public:
 	float DuplicateOffset = 100.0f;		// 复制偏移
 
 	UFUNCTION(BlueprintCallable)
-	void RandomizeSelectedActorsRotation();	// 随机旋转选中的Actor
+	void RandomizeSelectedActorsTransform();	// 随机变换选中的Actor
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomizeActorTransform")
-	FRandomActorRotation RandomRotation;	// 随机旋转
+	FRandomActorTransform RandomTransform;	// 随机变换
 
 private:
 	UPROPERTY()

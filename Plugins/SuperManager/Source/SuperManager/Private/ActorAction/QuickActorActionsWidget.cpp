@@ -116,7 +116,7 @@ void UQuickActorActionsWidget::DuplicateSelectedActors()
 	}
 }
 
-void UQuickActorActionsWidget::RandomizeSelectedActorsRotation()
+void UQuickActorActionsWidget::RandomizeSelectedActorsTransform()
 {
 	if (!GetEditorActorSubsystem()) return;
 
@@ -133,24 +133,57 @@ void UQuickActorActionsWidget::RandomizeSelectedActorsRotation()
 	{
 		if (Actor)
 		{
+			// 旋转
 			FRotator NewRotation = Actor->GetActorRotation();
 
-			if (RandomRotation.bRandomPitch)
+			if (RandomTransform.bRandomPitch)
 			{
-				NewRotation.Pitch = FMath::RandRange(RandomRotation.MinPitch, RandomRotation.MaxPitch);
+				NewRotation.Pitch = FMath::RandRange(RandomTransform.MinPitch, RandomTransform.MaxPitch);
 			}
 
-			if (RandomRotation.bRandomYaw)
+			if (RandomTransform.bRandomYaw)
 			{
-				NewRotation.Yaw = FMath::RandRange(RandomRotation.MinYaw, RandomRotation.MaxYaw);
+				NewRotation.Yaw = FMath::RandRange(RandomTransform.MinYaw, RandomTransform.MaxYaw);
 			}
 
-			if (RandomRotation.bRandomRoll)
+			if (RandomTransform.bRandomRoll)
 			{
-				NewRotation.Roll = FMath::RandRange(RandomRotation.MinRoll, RandomRotation.MaxRoll);
+				NewRotation.Roll = FMath::RandRange(RandomTransform.MinRoll, RandomTransform.MaxRoll);
 			}
 
 			Actor->SetActorRotation(NewRotation);
+
+			// 缩放
+			if (RandomTransform.bRandomScale)
+			{
+				const float r = FMath::RandRange(RandomTransform.MinScale, RandomTransform.MaxScale);
+
+				Actor->SetActorScale3D(FVector(r, r, r));
+				
+			}
+
+			// 位置
+			if (RandomTransform.bRandomLocationXAixs)
+			{
+				FVector NewLocation = Actor->GetActorLocation();
+				NewLocation.X += FMath::RandRange(RandomTransform.MinLocationX, RandomTransform.MaxLocationX);
+				Actor->SetActorLocation(NewLocation);
+			}
+
+			if (RandomTransform.bRandomLocationYAixs)
+			{
+				FVector NewLocation = Actor->GetActorLocation();
+				NewLocation.Y += FMath::RandRange(RandomTransform.MinLocationY, RandomTransform.MaxLocationY);
+				Actor->SetActorLocation(NewLocation);
+			}
+
+			if (RandomTransform.bRandomLocationZAixs)
+			{
+				FVector NewLocation = Actor->GetActorLocation();
+				NewLocation.Z += FMath::RandRange(RandomTransform.MinLocationZ, RandomTransform.MaxLocationZ);
+				Actor->SetActorLocation(NewLocation);
+			}
+
 			SelectedCount++;
 		}
 	}
