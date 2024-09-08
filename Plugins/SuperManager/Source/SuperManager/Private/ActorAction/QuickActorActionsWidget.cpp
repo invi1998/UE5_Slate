@@ -49,6 +49,73 @@ void UQuickActorActionsWidget::SelectAllActorsWithSimilarName()
 
 }
 
+void UQuickActorActionsWidget::DuplicateSelectedActors()
+{
+	if (!GetEditorActorSubsystem()) return;
+
+	TArray<AActor*> SelectedActors = EditorActorSubsystem->GetSelectedLevelActors();		// 获取选中的Actor
+	uint32 SelectedCount = 0;
+
+	if (SelectedActors.Num() <= 0)
+	{
+		SM_Debug::ShowNotifyInfo(FText::FromString("No actor selected!"), FText::FromString("Warning"));
+		return;
+	}
+
+	if (DuplicateCount <= 0)
+	{
+		SM_Debug::ShowNotifyInfo(FText::FromString("Duplicate count must be greater than 0!"), FText::FromString("Warning"));
+		return;
+	}
+
+	if (DuplicateOffset == 0)
+	{
+		SM_Debug::ShowNotifyInfo(FText::FromString("Duplicate offset not equal 0!"), FText::FromString("Warning"));
+		return;
+	}
+
+	for (AActor* Actor : SelectedActors)
+	{
+		if (Actor)
+		{
+			for (int i = 0; i < DuplicateCount; i++)
+			{
+				FVector Offset = FVector::ZeroVector;
+
+				switch (DuplicateAxis)
+				{
+				case E_DuplicateAxis::EDA_XAxis:
+					Offset.X = DuplicateOffset * (i + 1);
+					break;
+				case E_DuplicateAxis::EDA_YAxis:
+					Offset.Y = DuplicateOffset * (i + 1);
+					break;
+				case E_DuplicateAxis::EDA_ZAxis:
+					Offset.Z = DuplicateOffset * (i + 1);
+					break;
+				default:
+					break;
+				}
+
+				if (AActor* NewActor = EditorActorSubsystem->DuplicateActor(Actor, Actor->GetWorld(), Offset))
+				{
+					EditorActorSubsystem->SetActorSelectionState(NewActor, true);	// 选中Actor
+					SelectedCount++;
+				}
+			}
+		}
+	}
+
+	if (SelectedCount > 0)
+	{
+		SM_Debug::ShowNotifyInfo(FText::FromString(FString::Printf(TEXT("Duplicated %d actors!"), SelectedCount)), FText::FromString("Success"));
+	}
+	else
+	{
+		SM_Debug::ShowNotifyInfo(FText::FromString("No actor duplicated!"), FText::FromString("Warning"));
+	}
+}
+
 bool UQuickActorActionsWidget::GetEditorActorSubsystem()
 {
 	if (EditorActorSubsystem == nullptr)

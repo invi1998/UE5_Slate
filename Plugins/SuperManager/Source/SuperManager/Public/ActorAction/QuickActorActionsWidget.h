@@ -6,6 +6,16 @@
 #include "EditorUtilityWidget.h"
 #include "QuickActorActionsWidget.generated.h"
 
+UENUM(BlueprintType)
+enum class E_DuplicateAxis : uint8
+{
+	EDA_XAxis	UMETA(DisplayName = "X Axis"),
+	EDA_YAxis	UMETA(DisplayName = "Y Axis"),
+	EDA_ZAxis	UMETA(DisplayName = "Z Axis"),
+
+	EDA_MAX		UMETA(Hidden)
+};
+
 /**
  * 
  */
@@ -21,6 +31,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ActorBatchSelection")
 	TEnumAsByte<ESearchCase::Type> SelectionMode = ESearchCase::IgnoreCase;	// 选择模式:默认忽略大小写
 
+	UFUNCTION(BlueprintCallable)
+	void DuplicateSelectedActors();		// 复制选中的Actor
+
+	// 复制轴向（X、Y、Z）
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ActorDuplication")
+	E_DuplicateAxis DuplicateAxis = E_DuplicateAxis::EDA_XAxis;	// 复制轴向
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ActorDuplication")
+	int DuplicateCount = 1;		// 复制数量
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ActorDuplication")
+	float DuplicateOffset = 100.0f;		// 复制偏移
 
 private:
 	UPROPERTY()
