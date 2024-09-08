@@ -116,6 +116,55 @@ void UQuickActorActionsWidget::DuplicateSelectedActors()
 	}
 }
 
+void UQuickActorActionsWidget::RandomizeSelectedActorsRotation()
+{
+	if (!GetEditorActorSubsystem()) return;
+
+	TArray<AActor*> SelectedActors = EditorActorSubsystem->GetSelectedLevelActors();		// 获取选中的Actor
+	uint32 SelectedCount = 0;
+
+	if (SelectedActors.Num() <= 0)
+	{
+		SM_Debug::ShowNotifyInfo(FText::FromString("No actor selected!"), FText::FromString("Warning"));
+		return;
+	}
+
+	for (AActor* Actor : SelectedActors)
+	{
+		if (Actor)
+		{
+			FRotator NewRotation = Actor->GetActorRotation();
+
+			if (RandomRotation.bRandomPitch)
+			{
+				NewRotation.Pitch = FMath::RandRange(RandomRotation.MinPitch, RandomRotation.MaxPitch);
+			}
+
+			if (RandomRotation.bRandomYaw)
+			{
+				NewRotation.Yaw = FMath::RandRange(RandomRotation.MinYaw, RandomRotation.MaxYaw);
+			}
+
+			if (RandomRotation.bRandomRoll)
+			{
+				NewRotation.Roll = FMath::RandRange(RandomRotation.MinRoll, RandomRotation.MaxRoll);
+			}
+
+			Actor->SetActorRotation(NewRotation);
+			SelectedCount++;
+		}
+	}
+
+	if (SelectedCount > 0)
+	{
+		SM_Debug::ShowNotifyInfo(FText::FromString(FString::Printf(TEXT("Randomized %d actors rotation!"), SelectedCount)), FText::FromString("Success"));
+	}
+	else
+	{
+		SM_Debug::ShowNotifyInfo(FText::FromString("No actor randomized rotation!"), FText::FromString("Warning"));
+	}
+}
+
 bool UQuickActorActionsWidget::GetEditorActorSubsystem()
 {
 	if (EditorActorSubsystem == nullptr)

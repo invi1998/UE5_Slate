@@ -16,6 +16,39 @@ enum class E_DuplicateAxis : uint8
 	EDA_MAX		UMETA(Hidden)
 };
 
+USTRUCT(BlueprintType)
+struct FRandomActorRotation
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bRandomYaw = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomYaw"))
+	float MinYaw = -180.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomYaw"))
+	float MaxYaw = 180.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bRandomPitch = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomPitch"))
+	float MinPitch = -180.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomPitch"))
+	float MaxPitch = 180.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bRandomRoll = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomRoll"))
+	float MinRoll = -180.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomRoll"))
+	float MaxRoll = 180.0f;
+};
+
 /**
  * 
  */
@@ -43,6 +76,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ActorDuplication")
 	float DuplicateOffset = 100.0f;		// 复制偏移
+
+	UFUNCTION(BlueprintCallable)
+	void RandomizeSelectedActorsRotation();	// 随机旋转选中的Actor
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomizeActorTransform")
+	FRandomActorRotation RandomRotation;	// 随机旋转
 
 private:
 	UPROPERTY()
