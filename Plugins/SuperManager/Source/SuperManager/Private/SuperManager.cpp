@@ -51,6 +51,8 @@ void FSuperManagerModule::ShutdownModule()
 	FSuperManagerStyle::Shutdown();	// 关闭图标
 
 	FSuperManagerUICommands::Unregister();	// 注销UI命令
+
+	UnRegisterAlignmentColumn();	// 注销对齐列
 }
 
 
@@ -618,6 +620,13 @@ TSharedRef<ISceneOutlinerColumn> FSuperManagerModule::OnCreateAlignmentColumn(IS
 	// 创建对齐列
 	TSharedRef<ISceneOutlinerColumn> Column = MakeShared<FOutlinerSelectionColumn>(SceneOutliner);
 	return Column;
+}
+
+void FSuperManagerModule::UnRegisterAlignmentColumn()
+{
+	FSceneOutlinerModule& SceneOutlinerModule = FModuleManager::LoadModuleChecked<FSceneOutlinerModule>("SceneOutliner");
+
+	SceneOutlinerModule.UnRegisterColumnType<FOutlinerSelectionColumn>();
 }
 
 #pragma endregion

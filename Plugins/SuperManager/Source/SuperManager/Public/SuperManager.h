@@ -101,6 +101,8 @@ private:
 
 	TSharedRef<ISceneOutlinerColumn> OnCreateAlignmentColumn(ISceneOutliner& SceneOutliner);	// 创建对齐列
 
+	void UnRegisterAlignmentColumn();	// 注销对齐列
+
 #pragma endregion
 
 	TWeakObjectPtr<class UEditorActorSubsystem> WeakEditorActorSubsystem;	// 编辑器Actor子系统
