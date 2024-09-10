@@ -7,15 +7,14 @@
 // UI
 class FSuperManagerUICommands : public TCommands<FSuperManagerUICommands>
 {
-	public:
 
-	FSuperManagerUICommands()
-		: TCommands<FSuperManagerUICommands>(
-			"SuperManager",
-			NSLOCTEXT("Contexts", "SuperManagerUICommands", "SuperManagerUICommands"),
-			NAME_None,
-			"SuperManager") {}
+public:
+
+	FSuperManagerUICommands();
 
 	// TCommand<> interface
 	virtual void RegisterCommands() override;
+
+	TSharedPtr<FUICommandInfo> LockActorSelection;		// 当前选择的Actor锁定
+	TSharedPtr<FUICommandInfo> UnlockActorSelection;	// 当前选择的Actor解锁
 };

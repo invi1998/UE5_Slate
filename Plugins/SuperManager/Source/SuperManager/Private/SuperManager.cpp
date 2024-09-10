@@ -15,6 +15,7 @@
 #include "LevelEditor.h"
 #include "Engine/Selection.h"
 #include "Subsystems/EditorActorSubsystem.h"
+#include "CustomUICommands/SuperManagerUICommands.h"
 
 #define LOCTEXT_NAMESPACE "FSuperManagerModule"
 
@@ -26,6 +27,8 @@ void FSuperManagerModule::StartupModule()
 	InitCBMenuExtender();
 
 	RegisterAdvancedDeletionTabSpawner();
+
+	FSuperManagerUICommands::Register();	// 注册UI命令
 
 	InitLevelEditorMenuExtender();
 
