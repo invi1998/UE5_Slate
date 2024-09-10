@@ -45,6 +45,8 @@ void FSuperManagerModule::ShutdownModule()
 	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(AdvancedDeletionTabIdName);	// 注销高级删除选项卡生成器
 
 	FSuperManagerStyle::Shutdown();	// 关闭图标
+
+	FSuperManagerUICommands::Unregister();	// 注销UI命令
 }
 
 
