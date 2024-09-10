@@ -76,7 +76,8 @@ private:
 
 	void LockActorSelection(AActor* Actor);	// 锁定Actor选择
 	void UnlockActorSelection(AActor* Actor);	// 解锁Actor选择
-	
+
+	void RefreshSceneOutliner();	// 刷新场景大纲
 
 #pragma endregion
 

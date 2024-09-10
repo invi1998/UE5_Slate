@@ -381,6 +381,8 @@ void FSuperManagerModule::OnLockActorSelectionButtonClicked()
 		SelectedActorsName.Append("\n" + SelectedActor->GetActorLabel());
 
 	}
+	RefreshSceneOutliner();	// 刷新场景大纲
+
 	SelectedActorsName.Append("\n Have been locked");
 	SM_Debug::ShowNotifyInfo(FText::FromString(SelectedActorsName), FText::FromString("Success"));
 }
@@ -405,6 +407,8 @@ void FSuperManagerModule::OnUnlockActorSelectionButtonClicked()
 			UnlockedActorsName.Append("\n" + Actor->GetActorLabel());
 		}
 	}
+
+	RefreshSceneOutliner();	// 刷新场景大纲
 
 	UnlockedActorsName.Append("\n Have been unlocked");
 
@@ -510,6 +514,18 @@ void FSuperManagerModule::UnlockActorSelection(AActor* Actor)
 		{
 			Actor->Tags.Remove(TEXT("Locked"));
 		}
+	}
+}
+
+void FSuperManagerModule::RefreshSceneOutliner()
+{
+	// 刷新场景大纲
+	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
+
+	TSharedPtr<ISceneOutliner> SceneOutliner = LevelEditorModule.GetFirstLevelEditor()->GetMostRecentlyUsedSceneOutliner();
+	if (SceneOutliner.IsValid())
+	{
+		SceneOutliner->FullRefresh();
 	}
 }
 
