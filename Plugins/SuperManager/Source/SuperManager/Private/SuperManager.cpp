@@ -12,6 +12,7 @@
 #include "SlateWidgets/AdvanceDeletionWidget.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "CustomStyle/SuperManagerStyle.h"
+#include "LevelEditor.h"
 
 #define LOCTEXT_NAMESPACE "FSuperManagerModule"
 
@@ -23,6 +24,8 @@ void FSuperManagerModule::StartupModule()
 	InitCBMenuExtender();
 
 	RegisterAdvancedDeletionTabSpawner();
+
+	InitLevelEditorMenuExtender();
 }
 
 void FSuperManagerModule::ShutdownModule()
@@ -336,6 +339,78 @@ TArray<TSharedPtr<FAssetData>> FSuperManagerModule::GetAllAssetDatasUnderSelecte
 	}
 
 	return AssetDataList;
+}
+
+
+
+
+#pragma endregion
+
+
+#pragma region LevelEditorMenuExtender
+
+void FSuperManagerModule::OnLockActorSelectionButtonClicked() const
+{
+	// 锁定Actor选择按钮点击事件
+	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
+
+	SM_Debug::ShowNotifyInfo(FText::FromString("Lock Actor Selection"), FText::FromString("Success"));
+	
+}
+
+void FSuperManagerModule::OnUnlockActorSelectionButtonClicked() const
+{
+	// 解锁Actor选择按钮点击事件
+	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
+
+	SM_Debug::ShowNotifyInfo(FText::FromString("Unlock Actor Selection"), FText::FromString("Success"));
+}
+
+void FSuperManagerModule::OnAddLevelEditorMenuEntry(FMenuBuilder& MenuBuilder) const
+{
+	// 添加关卡编辑器菜单项
+	MenuBuilder.AddMenuEntry(
+		LOCTEXT("Lock Actor Selection", "锁定Actor选择"),
+		LOCTEXT("Prevent actor from being deselected", "防止Actor被取消选择"),
+		FSlateIcon(FSuperManagerStyle::GetStyleSetName(), "ContentBrowser.SelectionLock"),
+		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnLockActorSelectionButtonClicked));
+
+	MenuBuilder.AddMenuEntry(
+		LOCTEXT("Unlock All Actors Selection", "解锁所有Actor选择"),
+		LOCTEXT("Remove the selectin constraint of all actors", "移除所有Actor的选择约束"),
+		FSlateIcon(FSuperManagerStyle::GetStyleSetName(), "ContentBrowser.SelectionUnlock"),
+		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnUnlockActorSelectionButtonClicked));
+}
+
+
+TSharedRef<FExtender> FSuperManagerModule::CustomLevelEditorMenuExtender(const TSharedRef<FUICommandList> UICommandList, const TArray<AActor*> SelectedActors)
+{
+	
+	// 自定义关卡编辑器菜单扩展器
+	TSharedRef<FExtender> MenuExtender = MakeShareable(new FExtender);
+
+	if (SelectedActors.Num() > 0)
+	{
+		MenuExtender->AddMenuExtension(
+			"ActorOptions",
+			EExtensionHook::After,
+			UICommandList,
+			FMenuExtensionDelegate::CreateRaw(this, &FSuperManagerModule::OnAddLevelEditorMenuEntry));
+	}
+
+
+	return MenuExtender;
+}
+
+void FSuperManagerModule::InitLevelEditorMenuExtender()
+{
+	// 初始化关卡编辑器菜单扩展器
+	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
+
+	// 获取所有关卡视口上下文菜单扩展器
+	TArray<FLevelEditorModule::FLevelViewportMenuExtender_SelectedActors>& LevelEditorMenuExtenders = LevelEditorModule.GetAllLevelViewportContextMenuExtenders();
+
+	LevelEditorMenuExtenders.Add(FLevelEditorModule::FLevelViewportMenuExtender_SelectedActors::CreateRaw(this, &FSuperManagerModule::CustomLevelEditorMenuExtender));
 }
 
 #pragma endregion

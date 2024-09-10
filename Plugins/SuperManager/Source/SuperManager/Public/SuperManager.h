@@ -51,7 +51,21 @@ private:
 
 #pragma endregion
 
+
+// 关卡编辑器菜单扩展器
+#pragma region LevelEditorMenuExtender
+
+	void OnLockActorSelectionButtonClicked() const;	// 锁定Actor选择按钮点击事件
+	void OnUnlockActorSelectionButtonClicked() const;	// 解锁Actor选择按钮点击事件
+	void OnAddLevelEditorMenuEntry(class FMenuBuilder& MenuBuilder) const;	// 添加关卡编辑器菜单项
+	TSharedRef<FExtender> CustomLevelEditorMenuExtender(const TSharedRef<FUICommandList> UICommandList, const TArray<AActor*> SelectedActors);	// 自定义关卡编辑器菜单扩展器
+
+	void InitLevelEditorMenuExtender();	// 初始化关卡编辑器菜单扩展器
+
+#pragma endregion
+
 public:
+// 数据处理
 #pragma region ProccessDataForAssetList
 
 	static bool DeleteSingleAsset(const FAssetData& AssetData);	// 删除单个资产
