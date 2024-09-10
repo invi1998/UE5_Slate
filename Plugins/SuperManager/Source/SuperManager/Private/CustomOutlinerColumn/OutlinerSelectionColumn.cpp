@@ -42,10 +42,12 @@ SHeaderRow::FColumn::FArguments FOutlinerSelectionColumn::ConstructHeaderRowColu
 
 const TSharedRef<SWidget> FOutlinerSelectionColumn::ConstructRowWidget(FSceneOutlinerTreeItemRef TreeItem, const STableRow<FSceneOutlinerTreeItemPtr>& Row)
 {
-	return SNew(SBox)
+	TSharedRef<SCheckBox> RowWidgetCheckBox = SNew(SCheckBox)
+		.Visibility(EVisibility::Visible)
 		.HAlign(HAlign_Center)
-		.VAlign(VAlign_Center)
-		.Padding(2.0f);
+		.IsChecked(ECheckBoxState::Unchecked);
+
+	return RowWidgetCheckBox;
 }
 
 #undef LOCTEXT_NAMESPACE
