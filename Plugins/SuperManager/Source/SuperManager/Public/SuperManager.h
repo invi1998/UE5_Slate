@@ -76,7 +76,7 @@ private:
 
 	void LockActorSelection(AActor* Actor);	// 锁定Actor选择
 	void UnlockActorSelection(AActor* Actor);	// 解锁Actor选择
-	bool IsActorSelectionLocked(const AActor* Actor);	// Actor选择是否被锁定
+	
 
 #pragma endregion
 
@@ -107,6 +107,10 @@ private:
 	bool GetEditorActorSubsystem();	// 获取编辑器Actor子系统
 
 public:
+	bool IsActorSelectionLocked(const AActor* Actor);	// Actor选择是否被锁定
+
+	void ProcessActorSelectionLock(AActor* Actor, bool bLock);	// 处理Actor选择锁定
+
 // 数据处理
 #pragma region ProccessDataForAssetList
 

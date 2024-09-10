@@ -525,6 +525,24 @@ bool FSuperManagerModule::IsActorSelectionLocked(const AActor* Actor)
 
 }
 
+void FSuperManagerModule::ProcessActorSelectionLock(AActor* Actor, bool bLock)
+{
+	if (!GetEditorActorSubsystem()) return;
+
+	if (bLock)
+	{
+		LockActorSelection(Actor);
+
+		WeakEditorActorSubsystem->SetActorSelectionState(Actor, false);
+	}
+	else
+	{
+		UnlockActorSelection(Actor);
+
+		WeakEditorActorSubsystem->SetActorSelectionState(Actor, true);
+	}
+}
+
 
 #pragma endregion
 
