@@ -4,6 +4,7 @@
 #include "CustomStyle/SuperManagerStyle.h"
 #include "Interfaces/IPluginManager.h"
 #include "Styling/SlateStyleRegistry.h"
+#include "Styling/SlateColor.h"
 
 FName FSuperManagerStyle::StyleSetName = TEXT("SuperManagerStyle");
 TSharedPtr<FSlateStyleSet> FSuperManagerStyle::CustomSlateStyleSet = nullptr;
@@ -49,6 +50,23 @@ TSharedRef<FSlateStyleSet> FSuperManagerStyle::CreateSlateStyleSet()
 	Style->Set("ContentBrowser.SelectionLock", new FSlateImageBrush(IconDir / TEXT("SelectionLock.png"), FVector2D(16.0f, 16.0f)));
 	Style->Set("ContentBrowser.SelectionUnlock", new FSlateImageBrush(IconDir / TEXT("SelectionUnlock.png"), FVector2D(16.0f, 16.0f)));
 	Style->Set("ContentBrowser.SelectionLockNew", new FSlateImageBrush(IconDir / TEXT("SelectionLockNew.png"), FVector2D(16.0f, 16.0f)));
+
+
+	const FCheckBoxStyle SelectionLockCheckBoxStyle = FCheckBoxStyle()
+		.SetCheckBoxType(ESlateCheckBoxType::ToggleButton)
+		.SetPadding(FMargin(10.0f))
+
+		// 未选中状态下的背景图
+		.SetUncheckedImage(FSlateImageBrush(IconDir / TEXT("SelectionLockNew.png"), FVector2D(16.0f, 16.0f), FStyleColors::White))
+		.SetUncheckedHoveredImage(FSlateImageBrush(IconDir / TEXT("SelectionLockNew.png"), FVector2D(16.0f, 16.0f), FStyleColors::AccentBlue))
+		.SetUncheckedPressedImage(FSlateImageBrush(IconDir / TEXT("SelectionLockNew.png"), FVector2D(16.0f, 16.0f), FStyleColors::Foreground))
+
+		// 选中状态下的背景图
+		.SetCheckedImage(FSlateImageBrush(IconDir / TEXT("SelectionLockNew.png"), FVector2D(16.0f, 16.0f), FStyleColors::Foreground))
+		.SetCheckedHoveredImage(FSlateImageBrush(IconDir / TEXT("SelectionLockNew.png"), FVector2D(16.0f, 16.0f), FStyleColors::AccentBlack))
+		.SetCheckedPressedImage(FSlateImageBrush(IconDir / TEXT("SelectionLockNew.png"), FVector2D(16.0f, 16.0f), FStyleColors::AccentGray));
+
+	Style->Set("SelectionLockCheckBox", SelectionLockCheckBoxStyle);
 
 	return Style;
 }
