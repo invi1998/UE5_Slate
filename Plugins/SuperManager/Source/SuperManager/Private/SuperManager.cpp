@@ -30,6 +30,8 @@ void FSuperManagerModule::StartupModule()
 
 	FSuperManagerUICommands::Register();	// 注册UI命令
 
+	InitCustomUICommands();	// 初始化自定义UI命令
+
 	InitLevelEditorMenuExtender();
 
 	InitCustomSelectionEvents();
@@ -445,6 +447,9 @@ void FSuperManagerModule::InitLevelEditorMenuExtender()
 	// 初始化关卡编辑器菜单扩展器
 	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
 
+	const TSharedRef<FUICommandList> ExistingLevelEditorCommands = LevelEditorModule.GetGlobalLevelEditorActions();	// 获取全局关卡编辑器命令列表
+	ExistingLevelEditorCommands->Append(CustomUICommandList.ToSharedRef());	// 添加自定义UI命令列表
+
 	// 获取所有关卡视口上下文菜单扩展器
 	TArray<FLevelEditorModule::FLevelViewportMenuExtender_SelectedActors>& LevelEditorMenuExtenders = LevelEditorModule.GetAllLevelViewportContextMenuExtenders();
 
@@ -512,6 +517,41 @@ bool FSuperManagerModule::IsActorSelectionLocked(const AActor* Actor)
 
 	return false;
 
+}
+
+
+#pragma endregion
+
+
+#pragma region UICommandHotKeyLock
+
+void FSuperManagerModule::InitCustomUICommands()
+{
+	// 初始化自定义UI命令
+	CustomUICommandList = MakeShareable(new FUICommandList);
+
+	// 添加UI命令
+	CustomUICommandList->MapAction(
+		FSuperManagerUICommands::Get().LockActorSelection,
+		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnSelectionLockHotKeyPressed)
+	);
+
+	CustomUICommandList->MapAction(
+		FSuperManagerUICommands::Get().UnlockActorSelection,
+		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnSelectionUnlockHotKeyPressed)
+	);
+}
+
+void FSuperManagerModule::OnSelectionLockHotKeyPressed()
+{
+	// 选择锁定热键按下
+	OnLockActorSelectionButtonClicked();
+}
+
+void FSuperManagerModule::OnSelectionUnlockHotKeyPressed()
+{
+	// 选择解锁热键按下
+	OnUnlockActorSelectionButtonClicked();
 }
 
 

@@ -58,7 +58,7 @@ private:
 	void OnLockActorSelectionButtonClicked();	// 锁定Actor选择按钮点击事件
 	void OnUnlockActorSelectionButtonClicked();	// 解锁Actor选择按钮点击事件
 	void OnAddLevelEditorMenuEntry(class FMenuBuilder& MenuBuilder);	// 添加关卡编辑器菜单项
-	TSharedRef<FExtender> CustomLevelEditorMenuExtender(const TSharedRef<FUICommandList> UICommandList, const TArray<AActor*> SelectedActors);	// 自定义关卡编辑器菜单扩展器
+	TSharedRef<FExtender> CustomLevelEditorMenuExtender(const TSharedRef<class FUICommandList> UICommandList, const TArray<AActor*> SelectedActors);	// 自定义关卡编辑器菜单扩展器
 
 	void InitLevelEditorMenuExtender();	// 初始化关卡编辑器菜单扩展器
 
@@ -74,6 +74,19 @@ private:
 	void LockActorSelection(AActor* Actor);	// 锁定Actor选择
 	void UnlockActorSelection(AActor* Actor);	// 解锁Actor选择
 	bool IsActorSelectionLocked(const AActor* Actor);	// Actor选择是否被锁定
+
+#pragma endregion
+
+// 热键锁定
+#pragma region UICommandHotKeyLock
+
+	TSharedPtr<class FUICommandList> CustomUICommandList;	// 自定义UI命令列表
+
+	void InitCustomUICommands();	// 初始化自定义UI命令
+
+	void OnSelectionLockHotKeyPressed();	// 选择锁定热键按下
+
+	void OnSelectionUnlockHotKeyPressed();	// 选择解锁热键按下
 
 #pragma endregion
 
