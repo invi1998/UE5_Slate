@@ -14,6 +14,7 @@
 #include "CustomStyle/SuperManagerStyle.h"
 #include "LevelEditor.h"
 #include "Engine/Selection.h"
+#include "Subsystems/EditorActorSubsystem.h"
 
 #define LOCTEXT_NAMESPACE "FSuperManagerModule"
 
@@ -352,24 +353,55 @@ TArray<TSharedPtr<FAssetData>> FSuperManagerModule::GetAllAssetDatasUnderSelecte
 
 #pragma region LevelEditorMenuExtender
 
-void FSuperManagerModule::OnLockActorSelectionButtonClicked() const
+void FSuperManagerModule::OnLockActorSelectionButtonClicked()
 {
-	// 锁定Actor选择按钮点击事件
-	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
+	if (!GetEditorActorSubsystem()) return;
 
-	SM_Debug::ShowNotifyInfo(FText::FromString("Lock Actor Selection"), FText::FromString("Success"));
-	
+	TArray<AActor*> SelectedActors = WeakEditorActorSubsystem->GetSelectedLevelActors();	// 获取选中的Actor
+
+	FString SelectedActorsName = TEXT("Selected actors: ");
+	for (AActor* SelectedActor : SelectedActors)
+	{
+		// 锁定Actor选择
+		LockActorSelection(SelectedActor);
+
+		WeakEditorActorSubsystem->SetActorSelectionState(SelectedActor, false);	// 取消选择
+
+		SelectedActorsName.Append("\n" + SelectedActor->GetActorLabel());
+
+	}
+	SelectedActorsName.Append("\n Have been locked");
+	SM_Debug::ShowNotifyInfo(FText::FromString(SelectedActorsName), FText::FromString("Success"));
 }
 
-void FSuperManagerModule::OnUnlockActorSelectionButtonClicked() const
+void FSuperManagerModule::OnUnlockActorSelectionButtonClicked()
 {
-	// 解锁Actor选择按钮点击事件
-	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
+	if (!GetEditorActorSubsystem()) return;
 
-	SM_Debug::ShowNotifyInfo(FText::FromString("Unlock Actor Selection"), FText::FromString("Success"));
+	TArray<AActor*> AllActors = WeakEditorActorSubsystem->GetAllLevelActors();	// 获取所有的Actor
+
+	FString UnlockedActorsName = TEXT("These actors: ");
+
+	for (AActor* Actor : AllActors)
+	{
+		if (IsActorSelectionLocked(Actor))
+		{
+			// 解锁Actor选择
+			UnlockActorSelection(Actor);
+
+			WeakEditorActorSubsystem->SetActorSelectionState(Actor, true);
+
+			UnlockedActorsName.Append("\n" + Actor->GetActorLabel());
+		}
+	}
+
+	UnlockedActorsName.Append("\n Have been unlocked");
+
+	SM_Debug::ShowNotifyInfo(FText::FromString(UnlockedActorsName), FText::FromString("Success"));
+
 }
 
-void FSuperManagerModule::OnAddLevelEditorMenuEntry(FMenuBuilder& MenuBuilder) const
+void FSuperManagerModule::OnAddLevelEditorMenuEntry(FMenuBuilder& MenuBuilder)
 {
 	// 添加关卡编辑器菜单项
 	MenuBuilder.AddMenuEntry(
@@ -423,15 +455,16 @@ void FSuperManagerModule::InitLevelEditorMenuExtender()
 
 void FSuperManagerModule::OnActorSelected(UObject* SelectedObject)
 {
-	// Actor被选中
+	if (!GetEditorActorSubsystem()) return;
 
+	// Actor被选中
 	if (AActor* SelectedActor = Cast<AActor>(SelectedObject))
 	{
-		SM_Debug::ShowNotifyInfo(FText::FromString(FString::Printf(TEXT("Selected Actor: %s"), *SelectedActor->GetActorLabel())), FText::FromString("Success"));
-	}
-	else
-	{
-		SM_Debug::ShowNotifyInfo(FText::FromString("Selected Object is not an Actor"), FText::FromString("Warning"));
+		if (IsActorSelectionLocked(SelectedActor))
+		{
+			// 如果Actor选择被锁定，则取消选择
+			WeakEditorActorSubsystem->SetActorSelectionState(SelectedActor, false);
+		}
 	}
 }
 
@@ -442,10 +475,60 @@ void FSuperManagerModule::InitCustomSelectionEvents()
 	UserSelection->SelectObjectEvent.AddRaw(this, &FSuperManagerModule::OnActorSelected);	// 选中Actor事件
 }
 
+void FSuperManagerModule::LockActorSelection(AActor* Actor)
+{
+	if (Actor)
+	{
+		// 锁定Actor选择
+		if (!Actor->Tags.Contains(TEXT("Locked")))
+		{
+			Actor->Tags.Add(TEXT("Locked"));
+		}
+	}
+}
+
+void FSuperManagerModule::UnlockActorSelection(AActor* Actor)
+{
+	if (Actor)
+	{
+		// 解锁Actor选择
+		if (Actor->Tags.Contains(TEXT("Locked")))
+		{
+			Actor->Tags.Remove(TEXT("Locked"));
+		}
+	}
+}
+
+bool FSuperManagerModule::IsActorSelectionLocked(const AActor* Actor)
+{
+	if (Actor)
+	{
+		// Actor选择是否被锁定
+		return Actor->Tags.Contains(TEXT("Locked"));
+	}
+
+	return false;
+
+}
+
+
 #pragma endregion
 
 
+bool FSuperManagerModule::GetEditorActorSubsystem()
+{
+	// 获取编辑器Actor子系统
+	if (!WeakEditorActorSubsystem.IsValid())
+	{
+		WeakEditorActorSubsystem = GEditor->GetEditorSubsystem<UEditorActorSubsystem>();
+	}
+
+	return WeakEditorActorSubsystem.IsValid();
+}
+
+
 #pragma region ProccessDataForAssetList
+
 
 bool FSuperManagerModule::DeleteSingleAsset(const FAssetData& AssetData)
 {

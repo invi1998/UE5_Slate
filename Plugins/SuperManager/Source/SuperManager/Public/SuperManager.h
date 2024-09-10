@@ -55,9 +55,9 @@ private:
 // 关卡编辑器菜单扩展器
 #pragma region LevelEditorMenuExtender
 
-	void OnLockActorSelectionButtonClicked() const;	// 锁定Actor选择按钮点击事件
-	void OnUnlockActorSelectionButtonClicked() const;	// 解锁Actor选择按钮点击事件
-	void OnAddLevelEditorMenuEntry(class FMenuBuilder& MenuBuilder) const;	// 添加关卡编辑器菜单项
+	void OnLockActorSelectionButtonClicked();	// 锁定Actor选择按钮点击事件
+	void OnUnlockActorSelectionButtonClicked();	// 解锁Actor选择按钮点击事件
+	void OnAddLevelEditorMenuEntry(class FMenuBuilder& MenuBuilder);	// 添加关卡编辑器菜单项
 	TSharedRef<FExtender> CustomLevelEditorMenuExtender(const TSharedRef<FUICommandList> UICommandList, const TArray<AActor*> SelectedActors);	// 自定义关卡编辑器菜单扩展器
 
 	void InitLevelEditorMenuExtender();	// 初始化关卡编辑器菜单扩展器
@@ -71,7 +71,15 @@ private:
 	void OnActorSelected(UObject* SelectedObject);	// Actor被选中
 	void InitCustomSelectionEvents();	// 初始化自定义选择事件
 
+	void LockActorSelection(AActor* Actor);	// 锁定Actor选择
+	void UnlockActorSelection(AActor* Actor);	// 解锁Actor选择
+	bool IsActorSelectionLocked(const AActor* Actor);	// Actor选择是否被锁定
+
 #pragma endregion
+
+	TWeakObjectPtr<class UEditorActorSubsystem> WeakEditorActorSubsystem;	// 编辑器Actor子系统
+
+	bool GetEditorActorSubsystem();	// 获取编辑器Actor子系统
 
 public:
 // 数据处理
