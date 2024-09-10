@@ -34,7 +34,7 @@ SHeaderRow::FColumn::FArguments FOutlinerSelectionColumn::ConstructHeaderRowColu
 		[
 			SNew(SImage)
 				.ColorAndOpacity(FSlateColor::UseForeground())
-				.Image(FSuperManagerStyle::GetSlateStyleSet()->GetBrush("ContentBrowser.SelectionLock"))
+				.Image(FSuperManagerStyle::GetSlateStyleSet()->GetBrush("ContentBrowser.SelectionLockNew"))
 		];
 
 	return Args;
