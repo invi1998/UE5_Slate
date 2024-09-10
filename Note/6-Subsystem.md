@@ -172,3 +172,10 @@ Python当前是一个实验性功能。
 - 在编辑器中进行自动化测试时，可以利用这个子系统来模拟用户操作，比如移动或旋转Actor。
 - 在脚本化编辑工作流程中，该子系统提供了API来实现对编辑器内Actor的操作。
 
+
+
+# ISceneOutlinerInterface
+
+`ISceneOutlinerInterface` 是在 Unreal Engine (UE) 中的一个接口，它主要用于处理场景大纲视图（Scene Outliner）的交互。场景大纲视图是UE编辑器中的一个功能，允许用户以层次结构的形式查看场景中的所有Actor（可视为3D场景中的对象或实体）。这使得用户可以更容易地管理和操作场景中的大量Actor。
+
+在UE中，尤其是从UE4开始，场景大纲视图就作为视口的一部分存在，并且在UE5中得到了进一步的发展。通过实现 `ISceneOutlinerInterface` 接口，开发人员可以使他们的自定义Actor类型更好地集成到场景大纲视图的功能中，比如添加自定义列、过滤器或者上下文菜单项等。

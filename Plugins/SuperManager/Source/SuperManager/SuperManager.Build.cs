@@ -34,6 +34,7 @@ public class SuperManager : ModuleRules
 				"ContentBrowser",
 				"InputCore",
 				"Projects",
+				"SceneOutliner",
                 // ... add other public dependencies that you statically link with here ...
 			}
 			);
