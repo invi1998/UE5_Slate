@@ -13,6 +13,7 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "CustomStyle/SuperManagerStyle.h"
 #include "LevelEditor.h"
+#include "Engine/Selection.h"
 
 #define LOCTEXT_NAMESPACE "FSuperManagerModule"
 
@@ -26,6 +27,8 @@ void FSuperManagerModule::StartupModule()
 	RegisterAdvancedDeletionTabSpawner();
 
 	InitLevelEditorMenuExtender();
+
+	InitCustomSelectionEvents();
 }
 
 void FSuperManagerModule::ShutdownModule()
@@ -411,6 +414,32 @@ void FSuperManagerModule::InitLevelEditorMenuExtender()
 	TArray<FLevelEditorModule::FLevelViewportMenuExtender_SelectedActors>& LevelEditorMenuExtenders = LevelEditorModule.GetAllLevelViewportContextMenuExtenders();
 
 	LevelEditorMenuExtenders.Add(FLevelEditorModule::FLevelViewportMenuExtender_SelectedActors::CreateRaw(this, &FSuperManagerModule::CustomLevelEditorMenuExtender));
+}
+
+
+#pragma endregion
+
+#pragma region SelectionLock
+
+void FSuperManagerModule::OnActorSelected(UObject* SelectedObject)
+{
+	// Actor被选中
+
+	if (AActor* SelectedActor = Cast<AActor>(SelectedObject))
+	{
+		SM_Debug::ShowNotifyInfo(FText::FromString(FString::Printf(TEXT("Selected Actor: %s"), *SelectedActor->GetActorLabel())), FText::FromString("Success"));
+	}
+	else
+	{
+		SM_Debug::ShowNotifyInfo(FText::FromString("Selected Object is not an Actor"), FText::FromString("Warning"));
+	}
+}
+
+void FSuperManagerModule::InitCustomSelectionEvents()
+{
+	// 我们可以通过绑定事件来实现自定义选择事件
+	USelection* UserSelection = GEditor->GetSelectedActors();	// 获取选中的Actor
+	UserSelection->SelectObjectEvent.AddRaw(this, &FSuperManagerModule::OnActorSelected);	// 选中Actor事件
 }
 
 #pragma endregion

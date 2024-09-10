@@ -64,6 +64,15 @@ private:
 
 #pragma endregion
 
+
+// 选择锁定
+#pragma region SelectionLock
+
+	void OnActorSelected(UObject* SelectedObject);	// Actor被选中
+	void InitCustomSelectionEvents();	// 初始化自定义选择事件
+
+#pragma endregion
+
 public:
 // 数据处理
 #pragma region ProccessDataForAssetList
