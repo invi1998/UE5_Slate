@@ -11,6 +11,8 @@ public:
 
 	virtual FName GetColumnID() override;
 
+	static FName GetID();
+
 	virtual SHeaderRow::FColumn::FArguments ConstructHeaderRowColumn() override;
 
 	virtual const TSharedRef<SWidget> ConstructRowWidget(FSceneOutlinerTreeItemRef TreeItem, const STableRow<FSceneOutlinerTreeItemPtr>& Row) override;

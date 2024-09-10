@@ -30,6 +30,11 @@ void FSuperManagerStyle::Shutdown()
 	}
 }
 
+TSharedRef<FSlateStyleSet> FSuperManagerStyle::GetSlateStyleSet()
+{
+	return CustomSlateStyleSet.ToSharedRef();
+}
+
 TSharedRef<FSlateStyleSet> FSuperManagerStyle::CreateSlateStyleSet()
 {
 	TSharedRef<FSlateStyleSet> Style = MakeShareable(new FSlateStyleSet(StyleSetName));

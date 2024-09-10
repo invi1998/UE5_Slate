@@ -13,9 +13,11 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "CustomStyle/SuperManagerStyle.h"
 #include "LevelEditor.h"
+#include "SceneOutlinerModule.h"
 #include "Engine/Selection.h"
 #include "Subsystems/EditorActorSubsystem.h"
 #include "CustomUICommands/SuperManagerUICommands.h"
+#include "CustomOutlinerColumn/OutlinerSelectionColumn.h"
 
 #define LOCTEXT_NAMESPACE "FSuperManagerModule"
 
@@ -35,6 +37,8 @@ void FSuperManagerModule::StartupModule()
 	InitLevelEditorMenuExtender();
 
 	InitCustomSelectionEvents();
+
+	InitSceneOutlinerAlignmentExtender();	// 初始化场景大纲对齐扩展器
 }
 
 void FSuperManagerModule::ShutdownModule()
@@ -556,6 +560,31 @@ void FSuperManagerModule::OnSelectionUnlockHotKeyPressed()
 	OnUnlockActorSelectionButtonClicked();
 }
 
+
+#pragma endregion
+
+
+#pragma region SceneOutlinerAlignmentExtender
+
+void FSuperManagerModule::InitSceneOutlinerAlignmentExtender()
+{
+	FSceneOutlinerModule& SceneOutlinerModule = FModuleManager::LoadModuleChecked<FSceneOutlinerModule>("SceneOutliner");
+
+	FSceneOutlinerColumnInfo SelectionLockColumnInfo(
+		ESceneOutlinerColumnVisibility::Visible,	// 列可见性
+		1,											// 列索引
+		FCreateSceneOutlinerColumn::CreateRaw(this, &FSuperManagerModule::OnCreateAlignmentColumn)	// 创建场景大纲列的委托方法
+	);
+
+	SceneOutlinerModule.RegisterDefaultColumnType<FOutlinerSelectionColumn>(SelectionLockColumnInfo);		// 注册默认列类型
+}
+
+TSharedRef<ISceneOutlinerColumn> FSuperManagerModule::OnCreateAlignmentColumn(ISceneOutliner& SceneOutliner)
+{
+	// 创建对齐列
+	TSharedRef<ISceneOutlinerColumn> Column = MakeShared<FOutlinerSelectionColumn>(SceneOutliner);
+	return Column;
+}
 
 #pragma endregion
 

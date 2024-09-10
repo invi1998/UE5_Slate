@@ -17,6 +17,8 @@ public:
 		return StyleSetName;
 	}
 
+	static TSharedRef<FSlateStyleSet> GetSlateStyleSet();
+
 private:
 	static FName StyleSetName;
 

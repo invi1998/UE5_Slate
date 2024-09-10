@@ -5,6 +5,9 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
+class ISceneOutliner;
+class ISceneOutlinerColumn;
+
 class FSuperManagerModule : public IModuleInterface
 {
 public:
@@ -87,6 +90,15 @@ private:
 	void OnSelectionLockHotKeyPressed();	// 选择锁定热键按下
 
 	void OnSelectionUnlockHotKeyPressed();	// 选择解锁热键按下
+
+#pragma endregion
+
+// 场景大纲对齐扩展
+#pragma region SceneOutlinerAlignmentExtender
+
+	void InitSceneOutlinerAlignmentExtender();	// 初始化场景大纲对齐扩展
+
+	TSharedRef<ISceneOutlinerColumn> OnCreateAlignmentColumn(ISceneOutliner& SceneOutliner);	// 创建对齐列
 
 #pragma endregion
 
