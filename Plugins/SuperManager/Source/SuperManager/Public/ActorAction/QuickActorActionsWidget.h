@@ -21,67 +21,67 @@ struct FRandomActorTransform
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform")
 	bool bRandomYaw = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomYaw"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform", meta = (EditCondition = "bRandomYaw"))
 	float MinYaw = -180.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomYaw"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform", meta = (EditCondition = "bRandomYaw"))
 	float MaxYaw = 180.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform")
 	bool bRandomPitch = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomPitch"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform", meta = (EditCondition = "bRandomPitch"))
 	float MinPitch = -180.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomPitch"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform", meta = (EditCondition = "bRandomPitch"))
 	float MaxPitch = 180.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform")
 	bool bRandomRoll = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomRoll"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform", meta = (EditCondition = "bRandomRoll"))
 	float MinRoll = -180.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomRoll"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform", meta = (EditCondition = "bRandomRoll"))
 	float MaxRoll = 180.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform")
 	bool bRandomScale = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomScale", ClampMin = "0.0001"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform", meta = (EditCondition = "bRandomScale", ClampMin = "0.0001"))
 	float MinScale = 0.5f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomScale", ClampMin = "0.0001"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform", meta = (EditCondition = "bRandomScale", ClampMin = "0.0001"))
 	float MaxScale = 1.5f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform")
 	bool bRandomLocationXAixs = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomLocationXAixs"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform", meta = (EditCondition = "bRandomLocationXAixs"))
 	float MinLocationX = -100.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomLocationXAixs"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform", meta = (EditCondition = "bRandomLocationXAixs"))
 	float MaxLocationX = 100.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform")
 	bool bRandomLocationYAixs = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomLocationYAixs"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform", meta = (EditCondition = "bRandomLocationYAixs"))
 	float MinLocationY = -100.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomLocationYAixs"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform", meta = (EditCondition = "bRandomLocationYAixs"))
 	float MaxLocationY = 100.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform")
 	bool bRandomLocationZAixs = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomLocationZAixs"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform", meta = (EditCondition = "bRandomLocationZAixs"))
 	float MinLocationZ = -100.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditCondition = "bRandomLocationZAixs"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomTransform", meta = (EditCondition = "bRandomLocationZAixs"))
 	float MaxLocationZ = 100.0f;
 
 };
@@ -95,13 +95,13 @@ class SUPERMANAGER_API UQuickActorActionsWidget : public UEditorUtilityWidget
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ActorBatchSelection")
 	void SelectAllActorsWithSimilarName();	// 选择所有名称相似的Actor
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ActorBatchSelection")
 	TEnumAsByte<ESearchCase::Type> SelectionMode = ESearchCase::IgnoreCase;	// 选择模式:默认忽略大小写
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ActorBatchSelection")
 	void DuplicateSelectedActors();		// 复制选中的Actor
 
 	// 复制轴向（X、Y、Z）
@@ -114,7 +114,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ActorDuplication")
 	float DuplicateOffset = 100.0f;		// 复制偏移
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "RandomizeActorTransform")
 	void RandomizeSelectedActorsTransform();	// 随机变换选中的Actor
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RandomizeActorTransform")
