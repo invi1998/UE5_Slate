@@ -46,7 +46,11 @@ private:
 
 	void RegisterAdvancedDeletionTabSpawner();	// 注册高级删除选项卡生成器
 
+	void OnAdvancedDeletionTabClosed(TSharedRef<SDockTab> ClosedTab);	// 高级删除选项卡关闭事件
+
 	TSharedRef<SDockTab>  OnSpawnAdvancedDeletionTab(const FSpawnTabArgs& Args);	// 生成高级删除选项卡
+
+	TSharedPtr<SDockTab> AdvancedDeletionTab;	// 高级删除选项卡
 
 	FName AdvancedDeletionTabIdName = "AdvancedDeletionTab";	// 高级删除选项卡名称
 

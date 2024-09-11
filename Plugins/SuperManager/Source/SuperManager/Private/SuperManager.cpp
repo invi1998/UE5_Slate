@@ -118,6 +118,15 @@ void FSuperManagerModule::OnAddCBMenuEntry(FMenuBuilder& MenuBuilder)
 
 void FSuperManagerModule::OnDeleteUnusedAssetsButtonClicked()
 {
+	const TArray<FString> TempFoldersArray = SelectedFolderPaths;	// 临时文件夹数组
+	if (AdvancedDeletionTab.IsValid())
+	{
+		AdvancedDeletionTab->RequestCloseTab();
+		SelectedFolderPaths = TempFoldersArray;
+		// SM_Debug::ShowMessageDialog(FText::FromString("Please close the advanced deletion tab first"), FText::FromString("Warning"), EAppMsgType::Ok);
+		// return;
+	}
+
 	// 删除未使用的资产按钮点击事件
 	if (SelectedFolderPaths.Num() > 1)
 	{
@@ -187,7 +196,14 @@ void FSuperManagerModule::OnDeleteUnusedAssetsButtonClicked()
 
 void FSuperManagerModule::OnDeleteEmptyFoldersButtonClicked()
 {
-	// UEditorAssetLibrary::DeleteDirectory(EmptyFolder);	// 删除文件夹
+	const TArray<FString> TempFoldersArray = SelectedFolderPaths;	// 临时文件夹数组
+	if (AdvancedDeletionTab.IsValid())
+	{
+		AdvancedDeletionTab->RequestCloseTab();
+		SelectedFolderPaths = TempFoldersArray;
+		// SM_Debug::ShowMessageDialog(FText::FromString("Please close the advanced deletion tab first"), FText::FromString("Warning"), EAppMsgType::Ok);
+		// return;
+	}
 
 	FixUpRedirectors();	// 修复重定向器
 
@@ -292,6 +308,15 @@ void FSuperManagerModule::FixUpRedirectors()
 
 void FSuperManagerModule::OnAdvanceDeletionButtonClicked()
 {
+	const TArray<FString> TempFoldersArray = SelectedFolderPaths;	// 临时文件夹数组
+	if (AdvancedDeletionTab.IsValid())
+	{
+		AdvancedDeletionTab->RequestCloseTab();
+		SelectedFolderPaths = TempFoldersArray;
+		// SM_Debug::ShowMessageDialog(FText::FromString("Please close the advanced deletion tab first"), FText::FromString("Warning"), EAppMsgType::Ok);
+		// return;
+	}
+
 	// 高级删除按钮点击事件
 	FGlobalTabmanager::Get()->TryInvokeTab(AdvancedDeletionTabIdName);
 }
@@ -307,16 +332,35 @@ void FSuperManagerModule::RegisterAdvancedDeletionTabSpawner()
 	.SetDisplayName(LOCTEXT("AdvancedDeletionTab", "高级删除"));
 }
 
+void FSuperManagerModule::OnAdvancedDeletionTabClosed(TSharedRef<SDockTab> ClosedTab)
+{
+	// 高级删除选项卡关闭事件
+	if (AdvancedDeletionTab.IsValid())
+	{
+		AdvancedDeletionTab.Reset();
+		SelectedFolderPaths.Empty();
+	}
+}
+
 TSharedRef<SDockTab> FSuperManagerModule::OnSpawnAdvancedDeletionTab(const FSpawnTabArgs& Args)
 {
 	// 生成高级删除选项卡
-	return
-		SNew(SDockTab).TabRole(ETabRole::NomadTab)
+	if (SelectedFolderPaths.Num() == 0)
+	{
+		return SNew(SDockTab).TabRole(ETabRole::NomadTab);
+	}
+
+	AdvancedDeletionTab = SNew(SDockTab).TabRole(ETabRole::NomadTab)
 		[
 			SNew(SAdvanceDeletionTab)
 				.AssetDataList(GetAllAssetDatasUnderSelectedFolder())
 				.CurrentSelectedFolderPath(SelectedFolderPaths.Num() > 0 ? SelectedFolderPaths[0] : FString())
 		];
+
+	// 设置选项卡关闭事件
+	AdvancedDeletionTab->SetOnTabClosed(SDockTab::FOnTabClosedCallback::CreateRaw(this, &FSuperManagerModule::OnAdvancedDeletionTabClosed));
+
+	return AdvancedDeletionTab.ToSharedRef();
 }
 
 TArray<TSharedPtr<FAssetData>> FSuperManagerModule::GetAllAssetDatasUnderSelectedFolder()
